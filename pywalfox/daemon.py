@@ -2,13 +2,13 @@ import sys
 import logging
 from threading import Thread
 
-import pywalfox.fetcher as fetcher
-import pywalfox.custom_css as custom_css
+import fetcher as fetcher
+import custom_css as custom_css
 
-from pywalfox.config import *
-from pywalfox.response import Message
-from pywalfox.messenger import Messenger
-from pywalfox.channel.server import Server
+from config import *
+from response import Message
+from messenger import Messenger
+from channel.server import Server
 
 class Daemon:
     """

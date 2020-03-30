@@ -5,9 +5,9 @@ import sys
 import logging
 import argparse
 
-from pywalfox.config import DAEMON_VERSION, LOG_FILE
-from pywalfox.daemon import Daemon
-from pywalfox.channel.client import Client
+from config import DAEMON_VERSION, LOG_FILE
+from daemon import Daemon
+from channel.client import Client
 
 parser = argparse.ArgumentParser(description='Pywalfox - Native messaging host')
 parser.add_argument('action', nargs='?', default='none', help='sends a message to the addon telling it to update the theme')
@@ -64,11 +64,10 @@ def send_update_action():
 
 def open_log_file():
     """Opens the daemon log file in an editor (default is vi)"""
-    log_path = './pywalfox/%s' % LOG_FILE
     if os.environ.get('EDITORs') is not None:
-        os.system('$EDITOR %s' % log_path)
+        os.system('$EDITOR %s' % LOG_FILE)
     else:
-        os.system('vi %s' % log_path)
+        os.system('vi %s' % LOG_FILE)
 
 def print_version():
     """Prints the current version of the daemon."""

@@ -1,7 +1,7 @@
 import os
 import socket
 
-from pywalfox.config import SOCKET_PATH
+from config import SOCKET_PATH
 
 class Connector:
     """Base class for UNIX-socket client and server."""

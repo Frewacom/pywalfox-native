@@ -1,6 +1,6 @@
 import os
 
-from pywalfox.utils.colors import generate_brighter_shade
+from utils.colors import generate_brighter_shade
 
 def get_colorscheme(path, shade_modifier):
     """
