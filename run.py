@@ -12,6 +12,14 @@ parser.add_argument('action', nargs='?', default='none', help='sends a message t
 parser.add_argument('-d', '--debug', dest='debug', action='store_true', help='runs the daemon in debug mode')
 parser.add_argument('-v', '--version', dest='version', action='store_true', help='runs the daemon in debug mode')
 
+def check_python_version(python_version):
+    """Checks if the current python version is supported."""
+    if python_version < (2,7):
+        logging.error('Python version %s is not ssupported' % python_version)
+        sys.exit(0)
+    else:
+        logging.debug('Using python %s.%s' % (python_version[0], python_version[1]))
+
 def send_update_action():
     """Sends the update command to the socket server."""
     client = Client()
@@ -48,10 +56,13 @@ def handle_exit_args(args):
 
 def main():
     """Handles arguments and starts the daemon."""
+    python_version = sys.version_info
+    check_python_version(python_version)
+
     args = parser.parse_args()
     handle_exit_args(args)
 
-    daemon = Daemon(args.debug)
+    daemon = Daemon(python_version.major, args.debug)
     daemon.start()
     daemon.close()
 

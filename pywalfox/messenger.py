@@ -6,11 +6,15 @@ import logging
 from pywalfox.config import DAEMON_VERSION, ACTIONS
 
 class Messenger:
-    """Handles the sending and receiving of messages to and from the addon using stdio."""
-    def __init__(self):
-        self.stdout, self.stdin = self.get_stdio_handle()
+    """
+    Handles the sending and receiving of messages to and from the addon using stdio.
 
-    def get_stdio_handle(self):
+    :param version str: the current major python version
+    """
+    def __init__(self, version):
+        self.stdout, self.stdin = self.get_stdio_handle(version)
+
+    def get_stdio_handle(self, python_version):
         """
         Gets the stdin and stdout handles depending on the current python version.
         Python 2.x uses 'sys.stdout.xxx', whereas python 3.x uses 'sys.stdout.buffer.xxx'.
@@ -18,16 +22,10 @@ class Messenger:
         :return: (stdout handle, stdin handle) based on the current python version
         :rType: tuple
         """
-        version = sys.version_info.major
-        if version == 2:
-            logging.debug('Messenger was setup using python 2')
+        if python_version == 2:
             return (sys.stdout, sys.stdin)
-        elif version == 3:
-            logging.debug('Messenger was setup using python 3')
-            return (sys.stdout.buffer, sys.stdin.buffer)
         else:
-            logging.error('Python version %s is not ssupported' % version)
-            sys.exit(0)
+            return (sys.stdout.buffer, sys.stdin.buffer)
 
     def decode_message(self, encoded_length):
         """

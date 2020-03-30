@@ -14,15 +14,18 @@ class Daemon:
     """
     Application entry point. Initializes the application.
 
+    :param python_version str: the current major python version
     :param debug bool: if debugging is enabled (defaults to True)
     """
-    def __init__(self, debug=False):
+    def __init__(self, python_version, debug=False):
         self.debug = debug
+        self.python_version = python_version
         self.set_logging()
         self.set_chrome_path()
         self.set_actions()
-        self.messenger = Messenger()
+        self.messenger = Messenger(self.python_version)
         self.socket_server = Server()
+        self.is_running = False
 
     def set_actions(self):
         """Defines the different messages from the addon that will be handled."""
@@ -162,13 +165,18 @@ class Daemon:
         """Starts the socket server and creates the socket thread."""
         success = self.socket_server.start()
         if success == True:
-            # We use daemon=True so that the thread will exit when the daemon exits.
-            # https://docs.python.org/2/library/threading.html#threading.Thread.daemon
-            self.socket_thread = Thread(target=self.socket_thread_worker, daemon=True)
+            if self.python_version == 3:
+                # We use daemon=True so that the thread will exit when the daemon exits.
+                # https://docs.python.org/2/library/threading.html#threading.Thread.daemon
+                self.socket_thread = Thread(target=self.socket_thread_worker, daemon=True)
+            else:
+                self.socket_thread = Thread(target=self.socket_thread_worker)
+
             self.socket_thread.start()
 
     def start(self):
         """Starts the daemon and listens for incoming messages."""
+        self.is_running = True
         self.start_socket_server()
         try:
             while True:
@@ -180,6 +188,8 @@ class Daemon:
     def close(self):
         """Application cleanup."""
         self.socket_server.close()
+        self.is_running = False
+
 
 
 
