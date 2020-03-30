@@ -2,13 +2,13 @@ import sys
 import logging
 from threading import Thread
 
-import config
-import fetcher
-import custom_css
+import pywalfox.fetcher as fetcher
+import pywalfox.custom_css as custom_css
 
-from response import Message
-from messenger import Messenger
-from channel.server as Server
+from pywalfox.config import *
+from pywalfox.response import Message
+from pywalfox.messenger import Messenger
+from pywalfox.channel.server import Server
 
 class Daemon:
     """
@@ -22,15 +22,15 @@ class Daemon:
         self.set_chrome_path()
         self.set_actions()
         self.messenger = Messenger()
-        self.socket_server = Server(config.SOCKET_PATH)
+        self.socket_server = Server()
 
     def set_actions(self):
         """Defines the different messages from the addon that will be handled."""
         self.actions = {}
-        self.actions[config.ACTIONS['version']] = self.send_version
-        self.actions[config.ACTIONS['colors']] = self.send_colorscheme
-        self.actions[config.ACTIONS['custom_css_enable']] = self.send_enable_css_response
-        self.actions[config.ACTIONS['custom_css_disable']] = self.send_disable_css_response
+        self.actions[ACTIONS['version']] = self.send_version
+        self.actions[ACTIONS['colors']] = self.send_colorscheme
+        self.actions[ACTIONS['custom_css_enable']] = self.send_enable_css_response
+        self.actions[ACTIONS['custom_css_disable']] = self.send_disable_css_response
 
     def set_chrome_path(self):
         """Tries to set the path to the chrome directory."""
@@ -62,7 +62,7 @@ class Daemon:
         """
         if not self.chrome_path:
             this.messenger.send_message(Message(
-                config.ACTIONS['custom_css_apply'],
+                ACTIONS['custom_css_apply'],
                 'Could not find path to chrome folder',
                 success=False
             ))
@@ -86,21 +86,21 @@ class Daemon:
 
     def send_version(self, message):
         """Sends the current daemon version to the addon."""
-        self.messenger.send_message(Message(config.ACTIONS['version'], config.DAEMON_VERSION))
+        self.messenger.send_message(Message(ACTIONS['version'], DAEMON_VERSION))
 
     def send_colorscheme(self, message):
         """Sends the current colorscheme to the addon."""
-        (success, data) = fetcher.get_colorscheme(config.PYWAL_COLORS_PATH, config.BG_LIGHT_MODIFIER)
+        (success, data) = fetcher.get_colorscheme(PYWAL_COLORS_PATH, BG_LIGHT_MODIFIER)
         if success == True:
             logging.debug('Successfully fetched pywal colors')
         else:
             logging.error(data)
 
-        this.messenger.send_message(Message(config.ACTIONS['colors'], data, success=success))
+        this.messenger.send_message(Message(ACTIONS['colors'], data, success=success))
 
     def send_invalid_action(self):
         """Sends an action to the addon indicating that the action sent was invalid"""
-        this.messenger.send_message(Message(config.ACTIONS['invalid_action'], {}, success=False))
+        this.messenger.send_message(Message(ACTIONS['invalid_action'], {}, success=False))
 
     def send_output(self, message):
         """
@@ -108,7 +108,7 @@ class Daemon:
 
         :param message str: the message to send to the addon
         """
-        this.messenger.send_message(Message(config.ACTIONS['output'], message))
+        this.messenger.send_message(Message(ACTIONS['output'], message))
 
     def send_enable_css_response(self, message):
         """
@@ -116,7 +116,7 @@ class Daemon:
 
         :param target string: the name of the CSS file to enable/disable
         """
-        action = config.ACTIONS['custom_css_enable']
+        action = ACTIONS['custom_css_enable']
         target = self.check_target(message)
         if target is not False:
             if self.check_chrome_path(action):
@@ -129,7 +129,7 @@ class Daemon:
 
         :param target string: the name of the CSS file to enable/disable
         """
-        action = config.ACTIONS['custom_css_disable']
+        action = ACTIONS['custom_css_disable']
         target = self.check_target(message)
         if target is not False:
             if self.check_chrome_path(action):
@@ -170,9 +170,12 @@ class Daemon:
     def start(self):
         """Starts the daemon and listens for incoming messages."""
         self.start_socket_server()
-        while True:
-            message = self.messenger.get_message()
-            self.handle_message(message)
+        try:
+            while True:
+                message = self.messenger.get_message()
+                self.handle_message(message)
+        except KeyboardInterrupt:
+            return
 
     def close(self):
         """Application cleanup."""

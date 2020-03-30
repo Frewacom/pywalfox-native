@@ -2,11 +2,14 @@ import os
 import socket
 import logging
 
-from connector import Connector
+from pywalfox.channel.connector import Connector
 
 class Client(Connector):
     """UNIX-socket client used to communicate with the daemon."""
-    def start():
+    def __init__(self):
+        Connector.__init__(self)
+
+    def start(self):
         """
         Connects to the UNIX-socket if it exists.
 

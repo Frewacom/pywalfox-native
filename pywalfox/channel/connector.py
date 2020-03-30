@@ -1,14 +1,12 @@
 import os
 import socket
 
-class Connector:
-    """
-    Base class for UNIX-socket client and server.
+from pywalfox.config import SOCKET_PATH
 
-    :param path str: file path to the UNIX-socket
-    """
-    def __init__(self, path):
-        self.path = path
+class Connector:
+    """Base class for UNIX-socket client and server."""
+    def __init__(self):
+        self.path = SOCKET_PATH
         self.socket = socket.socket(socket.AF_UNIX, socket.SOCK_DGRAM)
 
     def encode_message(self, message):
@@ -43,7 +41,7 @@ class Connector:
             logging.error('Failed to read data from socket')
             return
 
-        return self.decode_message(data):
+        return self.decode_message(data)
 
     def send_message(self, message):
         """

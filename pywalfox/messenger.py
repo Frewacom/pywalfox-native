@@ -3,7 +3,7 @@ import json
 import struct
 import logging
 
-from config import DAEMON_VERSION, ACTIONS
+from pywalfox.config import DAEMON_VERSION, ACTIONS
 
 class Messenger:
     """Handles the sending and receiving of messages to and from the addon using stdio."""

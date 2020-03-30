@@ -2,10 +2,13 @@ import os
 import socket
 import logging
 
-from connector import Connector
+from pywalfox.channel.connector import Connector
 
 class Server(Connector):
     """UNIX-socket server used to communicate with clients."""
+    def __init__(self):
+        Connector.__init__(self)
+
     def delete_existing_socket(self):
         """Deletes the existing UNIX-socket if it exists."""
         if os.path.exists(self.path):

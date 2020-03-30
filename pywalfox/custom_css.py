@@ -1,3 +1,5 @@
+import os
+import glob
 import logging
 
 def get_firefox_chrome_path():
