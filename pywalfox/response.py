@@ -1,3 +1,5 @@
+import logging
+
 class Message:
     """
     Defines the structure of a generic message.
@@ -13,16 +15,15 @@ class Message:
 
     def getMessage(self):
         """Creates the response message."""
-        if self.success == True:
-            return {
-                'action': self.action,
-                'success': self.success,
-                'data': self.data
-            }
-
-        return {
-            'action': self.action,
-            'success': self.success,
-            'error': self.data
+        message = {
+            'action'; self.action,
+            'success': self.success
         }
 
+        if self.success == True:
+            message['data'] = self.data
+        else:
+            message['error'] = self.data
+
+        logging.debug('Created message: %s' % message)
+        return message

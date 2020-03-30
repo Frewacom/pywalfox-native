@@ -71,7 +71,7 @@ class Messenger:
 
         :param message [Message|ErrorMessage]: the message to encode and send
         """
-        length, encoded_message = self.encoded_message(message_object.getMessage())
+        length, encoded_message = self.encode_message(message_object.getMessage())
         self.stdout.write(length)
         self.stdout.write(encoded_message)
         self.stdout.flush()
