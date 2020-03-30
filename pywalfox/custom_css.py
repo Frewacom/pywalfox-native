@@ -10,7 +10,6 @@ def get_firefox_chrome_path():
     profile_path = glob.glob('%s/*.default-release' % os.path.expanduser('~/.mozilla/firefox'))
 
     if len(profile_path) < 1:
-        logging.error('Could not find Firefox profile directory')
         return False
 
     chrome_path = os.path.join(profile_path[0], 'chrome')
@@ -19,7 +18,7 @@ def get_firefox_chrome_path():
 
     return chrome_path
 
-def apply_custom_css(chrome_path, filename):
+def enable_custom_css(chrome_path, name):
     """
     Applies a CSS file but putting it in the 'chrome' directory.
 
@@ -28,13 +27,14 @@ def apply_custom_css(chrome_path, filename):
     :return: (success, message)
     :rType: tuple
     """
+    filename = add_css_file_extension(name)
     try:
         shutil.copy('./assets/%s' % filename, '%s/%s' % (chrome_path, filename))
         return (True, 'Custom CSS: "%s" has been enabled' % filename)
     except Exception as e:
         return (False, 'Could not copy custom CSS to folder: %s' % str(e))
 
-def disable_custom_css(chrome_path, filename):
+def disable_custom_css(chrome_path, name):
     """
     Disabled a CSS file but removing it from the 'chrome' directory.
 
@@ -43,7 +43,7 @@ def disable_custom_css(chrome_path, filename):
     :return: (success, message)
     :rType: tuple
     """
-    try:
+    filename = add_css_file_extension(name)
     try:
         os.remove('%s/%s' % (chrome_path, filename))
         return (True, 'Custom CSS: "%s" has been disabled' % filename)

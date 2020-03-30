@@ -9,8 +9,8 @@ BG_LIGHT_MODIFIER=35
 ACTIONS = {
     'version': 'version',
     'colors': 'colors',
-    'invalid_message': 'invalidMessage',
+    'invalid_action': 'invalidMessage',
     'output': 'output',
-    'custom_css_apply': 'customCssApply',
-    'custom_css_apply': 'customCssRemove',
+    'custom_css_enable': 'customCssApply',
+    'custom_css_disable': 'customCssRemove',
 }

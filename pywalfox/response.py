@@ -4,6 +4,7 @@ class Message:
 
     :param action str: the action called by the addon
     :param data any: the additional data to send along with the message
+    :param success bool: if the action was successfull
     """
     def __init__(self, action, data, success=True):
         self.action = action
