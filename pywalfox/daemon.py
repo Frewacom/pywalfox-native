@@ -16,7 +16,7 @@ class Daemon:
     """
     def __init__(self, debug=False):
         self.debug = debug
-        self.setup_logging()
+        self.set_logging()
         self.set_chrome_path()
         self.messenger = Messenger()
 
@@ -28,7 +28,7 @@ class Daemon:
         else:
             logging.debug('Found valid chrome directory path')
 
-    def setup_logging(self):
+    def set_logging(self):
         """Setup logging format and destination."""
         log_level = logging.ERROR
         if self.debug == True:
