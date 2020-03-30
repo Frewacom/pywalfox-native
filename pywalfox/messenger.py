@@ -20,8 +20,10 @@ class Messenger:
         """
         version = sys.version_info.major
         if version == 2:
+            logging.debug('Messenger was setup using python 2')
             return (sys.stdout, sys.stdin)
         elif version == 3:
+            logging.debug('Messenger was setup using python 3')
             return (sys.stdout.buffer, sys.stdin.buffer)
         else:
             logging.error('Python version %s is not ssupported' % version)
