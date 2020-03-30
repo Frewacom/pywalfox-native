@@ -48,11 +48,12 @@ def set_logging(verbose):
 
 def check_python_version(python_version):
     """Checks if the current python version is supported."""
+    version_label = '%s.%s.%s' % (python_version[0], python_version[1], python_version[2])
     if python_version < (2,7):
-        logging.error('Python version %s is not ssupported' % python_version)
+        logging.error('Python version %s is not supported' % version_label)
         sys.exit(0)
     else:
-        logging.debug('Using python %s.%s' % (python_version[0], python_version[1]))
+        logging.debug('Using python %s' % version_label)
 
 def send_update_action():
     """Sends the update command to the socket server."""
@@ -64,10 +65,13 @@ def send_update_action():
 
 def open_log_file():
     """Opens the daemon log file in an editor (default is vi)"""
-    if os.environ.get('EDITORs') is not None:
-        os.system('$EDITOR %s' % LOG_FILE)
+    if os.path.isfile(LOG_FILE):
+        if os.environ.get('EDITORs') is not None:
+            os.system('$EDITOR %s' % LOG_FILE)
+        else:
+            os.system('vi %s' % LOG_FILE)
     else:
-        os.system('vi %s' % LOG_FILE)
+        print('No log file exists')
 
 def print_version():
     """Prints the current version of the daemon."""
