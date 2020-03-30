@@ -48,7 +48,7 @@ class Daemon:
         :rType: bool
         """
         if not self.chrome_path:
-            this.messenger.send_message(Message(
+            self.messenger.send_message(Message(
                 ACTIONS['custom_css_apply'],
                 'Could not find path to chrome folder',
                 success=False
@@ -68,7 +68,7 @@ class Daemon:
         if 'target' in message and len(message['target']) > 0:
             return message['target']
 
-        this.messenger.send_invalid_action()
+        self.messenger.send_invalid_action()
         return False
 
     def send_version(self, message):
@@ -83,11 +83,11 @@ class Daemon:
         else:
             logging.error(data)
 
-        this.messenger.send_message(Message(ACTIONS['colors'], data, success=success))
+        self.messenger.send_message(Message(ACTIONS['colors'], data, success=success))
 
     def send_invalid_action(self):
         """Sends an action to the addon indicating that the action sent was invalid"""
-        this.messenger.send_message(Message(ACTIONS['invalid_action'], {}, success=False))
+        self.messenger.send_message(Message(ACTIONS['invalid_action'], {}, success=False))
 
     def send_output(self, message):
         """
@@ -95,7 +95,7 @@ class Daemon:
 
         :param message str: the message to send to the addon
         """
-        this.messenger.send_message(Message(ACTIONS['output'], message))
+        self.messenger.send_message(Message(ACTIONS['output'], message))
 
     def send_enable_css_response(self, message):
         """
@@ -108,7 +108,7 @@ class Daemon:
         if target is not False:
             if self.check_chrome_path(action):
                 (success, message) = custom_css.enable_custom_css(self.chrome_path, target)
-                this.messenger.send_message(Message(action, message, success=success))
+                self.messenger.send_message(Message(action, message, success=success))
 
     def send_disable_css_response(self, message):
         """
@@ -121,7 +121,7 @@ class Daemon:
         if target is not False:
             if self.check_chrome_path(action):
                 (success, message) = custom_css.disable_custom_css(self.chrome_path, target)
-                this.messenger.send_message(Message(action, message, success=success))
+                self.messenger.send_message(Message(action, message, success=success))
 
     def handle_message(self, message):
         """

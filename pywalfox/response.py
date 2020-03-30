@@ -10,13 +10,13 @@ class Message:
     """
     def __init__(self, action, data, success=True):
         self.action = action
-        self.succcess = success
+        self.success = success
         self.data = data
 
     def getMessage(self):
         """Creates the response message."""
         message = {
-            'action'; self.action,
+            'action': self.action,
             'success': self.success
         }
 

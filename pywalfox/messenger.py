@@ -37,7 +37,7 @@ class Messenger:
         """
         data_length = struct.unpack('@I', encoded_length)[0]
         message = self.stdin.read(data_length).decode('utf-8')
-        return json.load(message)
+        return json.loads(message)
 
     def encode_message(self, message):
         """
