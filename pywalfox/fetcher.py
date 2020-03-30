@@ -1,9 +1,8 @@
 import os
 
-from config import BG_LIGHT_MODIFIER
 from utils.colors import generate_brighter_shade
 
-def get_colorscheme(path):
+def get_colorscheme(path, shade_modifier):
     """
     Fetches the pywal colors from the cache file.
 
@@ -20,10 +19,10 @@ def get_colorscheme(path):
         return (False, 'Could not read colors from: %s' % path)
 
     if len(colors) < 16:
-        return (False, 'The file containing the generated pywal colors is invalid')
+        return (False, '%s containing the generated pywal colors is invalid' % path)
 
     colors.append('#ffffff')
-    colors.append(generate_brighter_shade(colors[0], BG_LIGHT_MODIFIER))
+    colors.append(generate_brighter_shade(colors[0], shade_modifier))
 
     return (True, colors)
 

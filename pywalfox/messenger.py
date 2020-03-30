@@ -1,15 +1,12 @@
 import sys
 import json
 import struct
-
-import config
 import logging
 
-from response.message import Message
-from response.error import ErrorMessage
+from config import DAEMON_VERSION, ACTIONS
 
 class Messenger:
-    """Handles the sending and receiving of messages to and from the addon."""
+    """Handles the sending and receiving of messages to and from the addon using stdio."""
     def __init__(self):
         self.stdout, self.stdin = self.get_stdio_handle()
 
@@ -68,16 +65,20 @@ class Messenger:
 
         return self.decode_message(encoded_length)
 
-    def send_message(self, message):
+    def send_message(self, message_object):
         """
         Sends a message to stdout.
 
-        :param message object: the message to encode and send
+        :param message [Message|ErrorMessage]: the message to encode and send
         """
-        length, encoded_message = self.encoded_message(message)
+        length, encoded_message = self.encoded_message(message_object.getMessage())
         self.stdout.write(length)
         self.stdout.write(encoded_message)
         self.stdout.flush()
+
+
+
+
 
 
 
