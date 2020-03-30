@@ -1,5 +1,6 @@
 import os
 import glob
+import shutil
 import logging
 
 def get_firefox_chrome_path():
