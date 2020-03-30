@@ -15,12 +15,9 @@ class Daemon:
     Application entry point. Initializes the application.
 
     :param python_version str: the current major python version
-    :param debug bool: if debugging is enabled (defaults to True)
     """
-    def __init__(self, python_version, debug=False):
-        self.debug = debug
+    def __init__(self, python_version):
         self.python_version = python_version
-        self.set_logging()
         self.set_chrome_path()
         self.set_actions()
         self.messenger = Messenger(self.python_version)
@@ -42,19 +39,6 @@ class Daemon:
             logging.error('Could not find Firefox profile directory')
         else:
             logging.debug('Found valid chrome directory path')
-
-    def set_logging(self):
-        """Setup logging format and destination."""
-        log_level = logging.ERROR
-        if self.debug == True:
-            log_level = logging.DEBUG
-
-        logging.basicConfig(
-            format='[%(asctime)s] %(levelname)s:%(message)s',
-            datefmt='%m/%d/%Y %I:%M:%S %p',
-            filename=LOG_FILE,
-            level=log_level
-        )
 
     def check_chrome_path(self, action):
         """
