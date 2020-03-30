@@ -30,3 +30,29 @@ class Connector:
         :rType: str
         """
         return raw.decode('utf-8')
+
+    def get_message(self):
+        """
+        Reads and decodes an incoming message.
+
+        :return: the decoded data
+        :rType: str
+        """
+        data = self.socket.recv(1024)
+        if not data:
+            logging.error('Failed to read data from socket')
+            return
+
+        return self.decode_message(data):
+
+    def send_message(self, message):
+        """
+        Encodes and sends a message using the socket
+
+        :param data str: the string to send
+        """
+        encoded_message = self.encoded_message(message)
+        self.socket.send(encoded_message)
+
+
+

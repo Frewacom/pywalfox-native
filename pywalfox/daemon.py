@@ -1,5 +1,6 @@
 import sys
 import logging
+from threading import Thread
 
 import config
 import fetcher
@@ -7,6 +8,7 @@ import custom_css
 
 from response import Message
 from messenger import Messenger
+from channel.server as Server
 
 class Daemon:
     """
@@ -18,7 +20,17 @@ class Daemon:
         self.debug = debug
         self.set_logging()
         self.set_chrome_path()
+        self.set_actions()
         self.messenger = Messenger()
+        self.socket_server = Server(config.SOCKET_PATH)
+
+    def set_actions(self):
+        """Defines the different messages from the addon that will be handled."""
+        self.actions = {}
+        self.actions[config.ACTIONS['version']] = self.send_version
+        self.actions[config.ACTIONS['colors']] = self.send_colorscheme
+        self.actions[config.ACTIONS['custom_css_enable']] = self.send_enable_css_response
+        self.actions[config.ACTIONS['custom_css_disable']] = self.send_disable_css_response
 
     def set_chrome_path(self):
         """Tries to set the path to the chrome directory."""
@@ -58,11 +70,25 @@ class Daemon:
         else:
             return True
 
-    def send_version(self):
+    def check_target(self, message):
+        """
+        Checks if the message received specifies a target, or the message is invalid.
+
+        :param message object: the decoded message
+        :return: if message has key 'target' with a valid value
+        :rType: bool
+        """
+        if 'target' in message and len(message['target']) > 0:
+            return message['target']
+
+        this.messenger.send_invalid_action()
+        return False
+
+    def send_version(self, message):
         """Sends the current daemon version to the addon."""
         self.messenger.send_message(Message(config.ACTIONS['version'], config.DAEMON_VERSION))
 
-    def send_colorscheme(self):
+    def send_colorscheme(self, message):
         """Sends the current colorscheme to the addon."""
         (success, data) = fetcher.get_colorscheme(config.PYWAL_COLORS_PATH, config.BG_LIGHT_MODIFIER)
         if success == True:
@@ -84,27 +110,73 @@ class Daemon:
         """
         this.messenger.send_message(Message(config.ACTIONS['output'], message))
 
-    def send_enable_css_response(self, target):
+    def send_enable_css_response(self, message):
         """
         Tries to enable a custom CSS file and sends the result to the addon.
 
         :param target string: the name of the CSS file to enable/disable
         """
         action = config.ACTIONS['custom_css_enable']
-        if self.check_chrome_path(action):
-            (success, message) = custom_css.enable_custom_css(self.chrome_path, target)
-            this.messenger.send_message(Message(action, message, success=success))
+        target = self.check_target(message)
+        if target is not False:
+            if self.check_chrome_path(action):
+                (success, message) = custom_css.enable_custom_css(self.chrome_path, target)
+                this.messenger.send_message(Message(action, message, success=success))
 
-    def send_disable_css_response(self, target):
+    def send_disable_css_response(self, message):
         """
         Tries to disable a custom CSS file and sends the result to the addon.
 
         :param target string: the name of the CSS file to enable/disable
         """
         action = config.ACTIONS['custom_css_disable']
-        if self.check_chrome_path(action):
-            (success, message) = custom_css.disable_custom_css(self.chrome_path, target)
-            this.messenger.send_message(Message(action, message, success=success))
+        target = self.check_target(message)
+        if target is not False:
+            if self.check_chrome_path(action):
+                (success, message) = custom_css.disable_custom_css(self.chrome_path, target)
+                this.messenger.send_message(Message(action, message, success=success))
+
+    def handle_message(self, message):
+        """
+        Handles the incoming messages and does the appropriate action.
+
+        :param message object: the decoded message
+        """
+        try:
+            action = message['action']
+            if action in self.actions:
+                self.actions[action](message)
+            else:
+                self.send_invalid_action()
+        except KeyError:
+            self.send_invalid_action()
+
+    def socket_thread_worker(self):
+        """The socket server thread worker."""
+        while True:
+            message = self.socket_server.get_message()
+            if message == 'update':
+                self.send_colorscheme()
+
+    def start_socket_server(self):
+        """Starts the socket server and creates the socket thread."""
+        success = self.socket_server.start()
+        if success == True:
+            # We use daemon=True so that the thread will exit when the daemon exits.
+            # https://docs.python.org/2/library/threading.html#threading.Thread.daemon
+            self.socket_thread = Thread(target=self.socket_thread_worker, daemon=True)
+            self.socket_thread.start()
+
+    def start(self):
+        """Starts the daemon and listens for incoming messages."""
+        self.start_socket_server()
+        while True:
+            message = self.messenger.get_message()
+            self.handle_message(message)
+
+    def close(self):
+        """Application cleanup."""
+        self.socket_server.close()
 
 
 
