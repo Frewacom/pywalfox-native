@@ -84,7 +84,7 @@ class Daemon:
         """
         this.messenger.send_message(Message(config.ACTIONS['output'], message))
 
-    def send_enable_css_response(self, target)
+    def send_enable_css_response(self, target):
         """
         Tries to enable a custom CSS file and sends the result to the addon.
 
