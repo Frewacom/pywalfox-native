@@ -1,0 +1,86 @@
+import sys
+import json
+import struct
+
+import config
+import logging
+
+from response.message import Message
+from response.error import ErrorMessage
+
+class Messenger:
+    """Handles the sending and receiving of messages to and from the addon."""
+    def __init__(self):
+        self.stdout, self.stdin = self.get_stdio_handle()
+
+    def get_stdio_handle(self):
+        """
+        Gets the stdin and stdout handles depending on the current python version.
+        Python 2.x uses 'sys.stdout.xxx', whereas python 3.x uses 'sys.stdout.buffer.xxx'.
+
+        :return: (stdout handle, stdin handle) based on the current python version
+        :rType: tuple
+        """
+        version = sys.version_info.major
+        if version == 2:
+            return (sys.stdout, sys.stdin)
+        elif version == 3:
+            return (sys.stdout.buffer, sys.stdin.buffer)
+        else:
+            logging.error('Python version %s is not ssupported' % version)
+            sys.exit(0)
+
+    def decode_message(self, encoded_length):
+        """
+        Decodes a message received from stdin.
+
+        :param encoded_length buffer: the buffer containing the data length
+        :return: the decoded message
+        :rType: object
+        """
+        data_length = struct.unpack('@I', encoded_length)[0]
+        message = self.stdin.read(data_length).decode('utf-8')
+        return json.load(message)
+
+    def encode_message(self, message):
+        """
+        Encodes a message to be sent to stdout.
+
+        :param message object: the message to encode
+        :return: (length of encoded message, encoded message)
+        :rType: tuple
+        """
+        json_string = json.dumps(message).encode('utf-8')
+        buffer_length = struct.pack('@I', len(json_string))
+        return (buffer_length, json_string)
+
+    def get_message(self):
+        """
+        Reads message from addon in stdin.
+
+        :return: the decoded message
+        :rType: str
+        """
+        encoded_length = self.stdin.read(4)
+        if len(encoded_length) == 0:
+            logging.error('Failed to read data from stdin')
+            sys.exit(0)
+
+        return self.decode_message(encoded_length)
+
+    def send_message(self, message):
+        """
+        Sends a message to stdout.
+
+        :param message object: the message to encode and send
+        """
+        length, encoded_message = self.encoded_message(message)
+        self.stdout.write(length)
+        self.stdout.write(encoded_message)
+        self.stdout.flush()
+
+
+
+
+
+
