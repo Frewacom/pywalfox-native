@@ -35,10 +35,6 @@ class Daemon:
     def set_chrome_path(self):
         """Tries to set the path to the chrome directory."""
         self.chrome_path = custom_css.get_firefox_chrome_path()
-        if not self.chrome_path:
-            logging.error('Could not find Firefox profile directory')
-        else:
-            logging.debug('Found valid chrome directory path')
 
     def check_chrome_path(self, action):
         """
@@ -78,11 +74,6 @@ class Daemon:
     def send_colorscheme(self, message):
         """Sends the current colorscheme to the addon."""
         (success, data) = fetcher.get_colorscheme(PYWAL_COLORS_PATH, BG_LIGHT_MODIFIER)
-        if success == True:
-            logging.debug('Successfully fetched pywal colors')
-        else:
-            logging.error(data)
-
         self.messenger.send_message(Message(ACTIONS['colors'], data, success=success))
 
     def send_invalid_action(self):
@@ -143,6 +134,7 @@ class Daemon:
         while True:
             message = self.socket_server.get_message()
             if message == 'update':
+                logging.debug('Update triggered from external script')
                 self.send_colorscheme()
 
     def start_socket_server(self):
@@ -165,6 +157,7 @@ class Daemon:
         try:
             while True:
                 message = self.messenger.get_message()
+                logging.debug('Received message from addon: %s' % message)
                 self.handle_message(message)
         except KeyboardInterrupt:
             return
@@ -173,6 +166,7 @@ class Daemon:
         """Application cleanup."""
         self.socket_server.close()
         self.is_running = False
+        logging.debug('Cleanup')
 
 
 

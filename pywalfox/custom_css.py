@@ -13,10 +13,12 @@ def get_firefox_chrome_path():
     profile_path = glob.glob('%s/*.default-release' % os.path.expanduser('~/.mozilla/firefox'))
 
     if len(profile_path) < 1:
+        logging.debug('Could not find default Firefox profile')
         return False
 
     chrome_path = os.path.join(profile_path[0], 'chrome')
     if not os.path.exists(chrome_path):
+        logging.debug('Creating non-existant chrome directory')
         os.makedirs(chrome_path)
 
     return chrome_path
@@ -33,8 +35,10 @@ def enable_custom_css(chrome_path, name):
     filename = add_css_file_extension(name)
     try:
         shutil.copy('./assets/%s' % filename, '%s/%s' % (chrome_path, filename))
+        logging.debug('%s was enabled' % filename)
         return (True, 'Custom CSS: "%s" has been enabled' % filename)
     except Exception as e:
+        logging.debug('%s could not be enabled: %s' % filename, str(e))
         return (False, 'Could not copy custom CSS to folder: %s' % str(e))
 
 def disable_custom_css(chrome_path, name):
@@ -49,8 +53,10 @@ def disable_custom_css(chrome_path, name):
     filename = add_css_file_extension(name)
     try:
         os.remove('%s/%s' % (chrome_path, filename))
+        logging.debug('%s was disabled' % filename)
         return (True, 'Custom CSS: "%s" has been disabled' % filename)
     except Exception as e:
+        logging.debug('%s could not be disabled: %s' % filename, str(e))
         return (False, 'Could not remove custom CSS: %s' % str(e))
 
 def add_css_file_extension(name):
