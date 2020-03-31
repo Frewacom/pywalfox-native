@@ -64,7 +64,7 @@ class Daemon:
         if 'target' in message and len(message['target']) > 0:
             return message['target']
 
-        logging.debug('%s: target was not specified' % message['action'])
+        logging.error('%s: target was not specified' % message['action'])
         self.send_invalid_action()
         return False
 
@@ -129,7 +129,7 @@ class Daemon:
                 logging.debug('%s: no such action' % action)
                 self.send_invalid_action()
         except KeyError:
-            logging.debug('action was not defined')
+            logging.error('action was not defined')
             self.send_invalid_action()
 
     def socket_thread_worker(self):
