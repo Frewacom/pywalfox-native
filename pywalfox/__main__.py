@@ -5,14 +5,15 @@ import sys
 import logging
 import argparse
 
-from config import DAEMON_VERSION, LOG_FILE
+from config import DAEMON_VERSION
 from daemon import Daemon
 from channel.client import Client
+from utils.logger import *
 
 parser = argparse.ArgumentParser(description='Pywalfox - Native messaging host')
 parser.add_argument('action', nargs='?', default='none', help='sends a message to the addon telling it to update the theme')
 parser.add_argument('--verbose', dest='verbose', action='store_true', help='runs the daemon in verbose mode with debugging output')
-parser.add_argument('-t', '--terminal', dest='terminal', action='store_true', help='prints the debugging output instead of writing to logfile')
+parser.add_argument('-p', '--print', dest='print_mode', action='store_true', help='prints the debugging output instead of writing to logfile')
 parser.add_argument('-v', '--version', dest='version', action='store_true', help='displays the current version of the daemon')
 
 def handle_exit_args(args):
@@ -28,33 +29,6 @@ def handle_exit_args(args):
     if args.version:
         print_version()
         sys.exit(1)
-
-def set_logging(verbose, terminal):
-    """Setup logging format and destination."""
-    message_format = '[%(asctime)s] %(levelname)s:%(message)s'
-    message_datefmt = '%m/%d/%Y %I:%M:%S %p'
-    if verbose == True:
-        if terminal == True:
-            logging.basicConfig(
-                format=message_format,
-                datefmt=message_datefmt,
-                level=logging.DEBUG
-            )
-        else:
-            logging.basicConfig(
-                format=message_format,
-                datefmt=message_datefmt,
-                level=logging.DEBUG,
-                filename=LOG_FILE,
-                filemode='w'
-            )
-    else:
-        logging.basicConfig(
-            format=message_format,
-            datefmt=message_datefmt,
-            filename=LOG_FILE,
-            level=logging.ERROR
-        )
 
 def check_python_version(python_version):
     """Checks if the current python version is supported."""
@@ -92,7 +66,7 @@ def main():
     args = parser.parse_args()
     handle_exit_args(args)
 
-    set_logging(args.verbose, args.terminal)
+    setup_logging(args.verbose, args.print_mode)
 
     python_version = sys.version_info
     check_python_version(python_version)
