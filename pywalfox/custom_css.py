@@ -21,6 +21,7 @@ def get_firefox_chrome_path():
         logging.debug('Creating non-existant chrome directory')
         os.makedirs(chrome_path)
 
+    logging.debug('Found chrome directory at path: %s' % chrome_path)
     return chrome_path
 
 def enable_custom_css(chrome_path, name):
@@ -33,6 +34,7 @@ def enable_custom_css(chrome_path, name):
     :rType: tuple
     """
     filename = add_css_file_extension(name)
+    logging.debug('Enabling custom CSS file: %s' % filename)
     try:
         shutil.copy('./assets/%s' % filename, '%s/%s' % (chrome_path, filename))
         logging.debug('%s was enabled' % filename)
@@ -51,6 +53,7 @@ def disable_custom_css(chrome_path, name):
     :rType: tuple
     """
     filename = add_css_file_extension(name)
+    logging.debug('Disabling custom CSS file: %s' % filename)
     try:
         os.remove('%s/%s' % (chrome_path, filename))
         logging.debug('%s was disabled' % filename)

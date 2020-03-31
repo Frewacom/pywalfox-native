@@ -7,10 +7,10 @@ LOG_FILE='daemon.log'
 BG_LIGHT_MODIFIER=35
 
 ACTIONS = {
-    'version': 'version',
-    'colors': 'colors',
-    'invalid_action': 'invalidMessage',
-    'output': 'output',
-    'custom_css_enable': 'customCssApply',
-    'custom_css_disable': 'customCssRemove',
+    'VERSION': 'debug:version',
+    'OUTPUT': 'debug:output',
+    'COLORS': 'action:colors',
+    'INVALID_ACTION': 'action:invalid',
+    'CSS_ENABLE': 'css:enable',
+    'CSS_DISABLE': 'css:disable',
 }

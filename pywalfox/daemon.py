@@ -27,10 +27,10 @@ class Daemon:
     def set_actions(self):
         """Defines the different messages from the addon that will be handled."""
         self.actions = {}
-        self.actions[ACTIONS['version']] = self.send_version
-        self.actions[ACTIONS['colors']] = self.send_colorscheme
-        self.actions[ACTIONS['custom_css_enable']] = self.send_enable_css_response
-        self.actions[ACTIONS['custom_css_disable']] = self.send_disable_css_response
+        self.actions[ACTIONS['VERSION']] = self.send_version
+        self.actions[ACTIONS['COLORS']] = self.send_colorscheme
+        self.actions[ACTIONS['CSS_ENABLE']] = self.send_enable_css_response
+        self.actions[ACTIONS['CSS_DISABLE']] = self.send_disable_css_response
 
     def set_chrome_path(self):
         """Tries to set the path to the chrome directory."""
@@ -45,7 +45,7 @@ class Daemon:
         """
         if not self.chrome_path:
             self.messenger.send_message(Message(
-                ACTIONS['custom_css_apply'],
+                action,
                 'Could not find path to chrome folder',
                 success=False
             ))
@@ -64,21 +64,22 @@ class Daemon:
         if 'target' in message and len(message['target']) > 0:
             return message['target']
 
-        self.messenger.send_invalid_action()
+        logging.debug('%s: target was not specified' % message['action'])
+        self.send_invalid_action()
         return False
 
     def send_version(self, message):
         """Sends the current daemon version to the addon."""
-        self.messenger.send_message(Message(ACTIONS['version'], DAEMON_VERSION))
+        self.messenger.send_message(Message(ACTIONS['VERSION'], DAEMON_VERSION))
 
     def send_colorscheme(self, message):
         """Sends the current colorscheme to the addon."""
         (success, data) = fetcher.get_colorscheme(PYWAL_COLORS_PATH, BG_LIGHT_MODIFIER)
-        self.messenger.send_message(Message(ACTIONS['colors'], data, success=success))
+        self.messenger.send_message(Message(ACTIONS['COLORS'], data, success=success))
 
     def send_invalid_action(self):
         """Sends an action to the addon indicating that the action sent was invalid"""
-        self.messenger.send_message(Message(ACTIONS['invalid_action'], {}, success=False))
+        self.messenger.send_message(Message(ACTIONS['INVALID_ACTION'], {}, success=False))
 
     def send_output(self, message):
         """
@@ -86,7 +87,7 @@ class Daemon:
 
         :param message str: the message to send to the addon
         """
-        self.messenger.send_message(Message(ACTIONS['output'], message))
+        self.messenger.send_message(Message(ACTIONS['OUTPUT'], message))
 
     def send_enable_css_response(self, message):
         """
@@ -94,7 +95,7 @@ class Daemon:
 
         :param target string: the name of the CSS file to enable/disable
         """
-        action = ACTIONS['custom_css_enable']
+        action = ACTIONS['CSS_ENABLE']
         target = self.check_target(message)
         if target is not False:
             if self.check_chrome_path(action):
@@ -107,7 +108,7 @@ class Daemon:
 
         :param target string: the name of the CSS file to enable/disable
         """
-        action = ACTIONS['custom_css_disable']
+        action = ACTIONS['CSS_DISABLE']
         target = self.check_target(message)
         if target is not False:
             if self.check_chrome_path(action):
@@ -125,8 +126,10 @@ class Daemon:
             if action in self.actions:
                 self.actions[action](message)
             else:
+                logging.debug('%s: no such action' % action)
                 self.send_invalid_action()
         except KeyError:
+            logging.debug('action was not defined')
             self.send_invalid_action()
 
     def socket_thread_worker(self):
