@@ -60,16 +60,12 @@ def open_log_file():
     """Opens the daemon log file in an editor."""
     if os.path.isfile(LOG_FILE):
         file_path = os.path.join(os.getcwd(), LOG_FILE)
-        if sys.platform.startswith('win32'):
-            # https://stackoverflow.com/questions/3022013/windows-cant-find-the-file-on-subprocess-call
-            # I don't feel like finding a fix this, so nano will do. 
-            subprocess.run(['nano', file_path])
-        else:
-            editor = os.environ.get('EDITORs')
-            if editor is not None:
-                subprocess.run([editor, file_path])
-            else:
-                subprocess.run(['vi', file_path])
+        editor = 'nano'
+        
+        if not sys.platform.startswith('win32'):
+            editor = os.getenv('EDITOR', 'vi')
+
+        subprocess.run([editor, file_path])
     else:
         print('No log file exists')
 
