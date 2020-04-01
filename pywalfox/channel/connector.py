@@ -1,13 +1,27 @@
 import os
+import sys
 import socket
+import logging
 
-from config import SOCKET_PATH
+from config import UNIX_SOCKET_PATH, WIN_SOCKET_HOST
 
 class Connector:
-    """Base class for UNIX-socket client and server."""
-    def __init__(self):
-        self.path = SOCKET_PATH
-        self.socket = socket.socket(socket.AF_UNIX, socket.SOCK_DGRAM)
+    """
+    Base class for the socket server and client.
+    Depending on the current OS, a different socket type will be used, 
+    since UNIX-sockets are not properly supported on Windows. 
+    
+    :param platform_id str: the current platform identifier, e.g. win32
+    """
+    def __init__(self, platform_id):
+        if platform_id == 'win32':
+            self.host = WIN_SOCKET_HOST
+            self.socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+            logging.debug('Setup socket server using AF_INET (win32)')
+        else:
+            self.host = UNIX_SOCKET_PATH
+            self.socket = socket.socket(socket.AF_UNIX, socket.SOCK_DGRAM)
+            logging.debug('Setup socket server using AF_UNIX (linux)')
 
     def encode_message(self, message):
         """
@@ -49,8 +63,12 @@ class Connector:
 
         :param data str: the string to send
         """
-        encoded_message = self.encoded_message(message)
+        encoded_message = self.encode_message(message)
         self.socket.send(encoded_message)
+
+    def close(self):
+         """Closes the socket connection."""
+         self.socket.close()
 
 
 

@@ -1,6 +1,8 @@
 DAEMON_VERSION='2.0'
 
-SOCKET_PATH='/tmp/pywalfox_socket'
+UNIX_SOCKET_PATH='/tmp/pywalfox_socket'
+WIN_SOCKET_HOST = ('127.0.0.1', 56744)
+
 PYWAL_COLORS_PATH='~/.cache/wal/colors'
 
 LOG_FILE='daemon.log'

@@ -7,7 +7,12 @@ import argparse
 
 from config import DAEMON_VERSION
 from daemon import Daemon
-from channel.client import Client
+
+if sys.platform.startswith('win32'):
+    from channel.win.client import Client
+else:
+    from channel.unix.client import Client
+
 from utils.logger import *
 
 parser = argparse.ArgumentParser(description='Pywalfox - Native messaging host')
@@ -30,14 +35,17 @@ def handle_exit_args(args):
         print_version()
         sys.exit(1)
 
-def check_python_version(python_version):
-    """Checks if the current python version is supported."""
+def get_python_version():
+    """Gets the current python version and checks if it is supported."""
+    python_version = sys.version_info
     version_label = '%s.%s.%s' % (python_version[0], python_version[1], python_version[2])
     if python_version < (2,7):
         logging.error('Python version %s is not supported' % version_label)
         sys.exit(0)
     else:
         logging.debug('Using python %s' % version_label)
+    
+    return python_version
 
 def send_update_action():
     """Sends the update command to the socket server."""
@@ -68,8 +76,7 @@ def main():
 
     setup_logging(args.verbose, args.print_mode)
 
-    python_version = sys.version_info
-    check_python_version(python_version)
+    python_version = get_python_version()
 
     daemon = Daemon(python_version.major)
     daemon.start()

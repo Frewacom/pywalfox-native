@@ -8,7 +8,11 @@ import custom_css as custom_css
 from config import *
 from response import Message
 from messenger import Messenger
-from channel.server import Server
+
+if sys.platform.startswith('win32'):
+    from channel.win.server import Server
+else:
+    from channel.unix.server import Server
 
 class Daemon:
     """
@@ -19,18 +23,9 @@ class Daemon:
     def __init__(self, python_version):
         self.python_version = python_version
         self.set_chrome_path()
-        self.set_actions()
         self.messenger = Messenger(self.python_version)
         self.socket_server = Server()
         self.is_running = False
-
-    def set_actions(self):
-        """Defines the different messages from the addon that will be handled."""
-        self.actions = {}
-        self.actions[ACTIONS['VERSION']] = self.send_version
-        self.actions[ACTIONS['COLORS']] = self.send_colorscheme
-        self.actions[ACTIONS['CSS_ENABLE']] = self.send_enable_css_response
-        self.actions[ACTIONS['CSS_DISABLE']] = self.send_disable_css_response
 
     def set_chrome_path(self):
         """Tries to set the path to the chrome directory."""
@@ -68,11 +63,11 @@ class Daemon:
         self.send_invalid_action()
         return False
 
-    def send_version(self, message):
+    def send_version(self):
         """Sends the current daemon version to the addon."""
         self.messenger.send_message(Message(ACTIONS['VERSION'], DAEMON_VERSION))
 
-    def send_colorscheme(self, message):
+    def send_colorscheme(self):
         """Sends the current colorscheme to the addon."""
         (success, data) = fetcher.get_colorscheme(PYWAL_COLORS_PATH, BG_LIGHT_MODIFIER)
         self.messenger.send_message(Message(ACTIONS['COLORS'], data, success=success))
@@ -123,9 +118,15 @@ class Daemon:
         """
         try:
             action = message['action']
-            if action in self.actions:
-                self.actions[action](message)
-            else:
+            if action == actions[ACTIONS['VERSION']]: 
+                self.send_version()
+            elif action == actions[ACTIONS['COLORS']]: 
+                self.send_colorscheme()
+            elif action == actions[ACTIONS['CSS_ENABLE']]: 
+                self.send_enable_css_response()
+            elif action == actions[ACTIONS['CSS_DISABLE']]: 
+                self.send_disable_css_response()
+            else: 
                 logging.debug('%s: no such action' % action)
                 self.send_invalid_action()
         except KeyError:
