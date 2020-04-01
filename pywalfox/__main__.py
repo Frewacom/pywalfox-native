@@ -4,6 +4,7 @@ import os
 import sys
 import logging
 import argparse
+import subprocess
 
 from config import DAEMON_VERSION
 from daemon import Daemon
@@ -56,12 +57,19 @@ def send_update_action():
         client.send_message('update')
 
 def open_log_file():
-    """Opens the daemon log file in an editor (default is vi)"""
+    """Opens the daemon log file in an editor."""
     if os.path.isfile(LOG_FILE):
-        if os.environ.get('EDITORs') is not None:
-            os.system('$EDITOR %s' % LOG_FILE)
+        file_path = os.path.join(os.getcwd(), LOG_FILE)
+        if sys.platform.startswith('win32'):
+            # https://stackoverflow.com/questions/3022013/windows-cant-find-the-file-on-subprocess-call
+            # I don't feel like finding a fix this, so nano will do. 
+            subprocess.run(['nano', file_path])
         else:
-            os.system('vi %s' % LOG_FILE)
+            editor = os.environ.get('EDITORs')
+            if editor is not None:
+                subprocess.run([editor, file_path])
+            else:
+                subprocess.run(['vi', file_path])
     else:
         print('No log file exists')
 
