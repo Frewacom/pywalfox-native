@@ -2,6 +2,7 @@ import os
 import glob
 import shutil
 import logging
+from config import CSS_PATH
 
 def get_firefox_chrome_path():
     """
@@ -36,7 +37,7 @@ def enable_custom_css(chrome_path, name):
     filename = add_css_file_extension(name)
     logging.debug('Enabling custom CSS file: %s' % filename)
     try:
-        shutil.copy('./assets/%s' % filename, '%s/%s' % (chrome_path, filename))
+        shutil.copy(os.path.join(CSS_PATH, filename), os.path.join(chrome_path, filename))
         logging.debug('%s was enabled' % filename)
         return (True, 'Custom CSS: "%s" has been enabled' % filename)
     except Exception as e:
@@ -55,7 +56,7 @@ def disable_custom_css(chrome_path, name):
     filename = add_css_file_extension(name)
     logging.debug('Disabling custom CSS file: %s' % filename)
     try:
-        os.remove('%s/%s' % (chrome_path, filename))
+        os.remove(os.path.join(chrome_path, filename))
         logging.debug('%s was disabled' % filename)
         return (True, 'Custom CSS: "%s" has been disabled' % filename)
     except Exception as e:

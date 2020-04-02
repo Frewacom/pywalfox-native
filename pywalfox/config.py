@@ -1,17 +1,25 @@
+import os
+
 DAEMON_VERSION='2.0'
 
 UNIX_SOCKET_PATH='/tmp/pywalfox_socket'
 WIN_SOCKET_HOST = ('127.0.0.1', 56744)
 
-PYWAL_COLORS_PATH='~/.cache/wal/colors'
+PYWAL_COLORS_PATH=os.path.expanduser('~/.cache/wal/colors')
+APP_PATH=os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+CSS_PATH=os.path.join(APP_PATH, 'assets/css')
 
-LOG_FILE='daemon.log'
+MANIFEST_SRC_PATH=os.path.join(APP_PATH, 'assets/manifest.json')
+
+LOG_FILE_PATH=os.path.join(APP_PATH, 'daemon.log')
 LOG_FILE_COUNT=1
 LOG_FILE_MAX_SIZE=1000*200 # 0.2 mb
+LOG_FILE_FORMAT='[%(asctime)s] %(levelname)s:%(message)s'
+LOG_FILE_DATE_FORMAT='%m-%d-%Y %I:%M:%S'
 
 BG_LIGHT_MODIFIER=35
 
-ACTIONS = {
+ACTIONS={
     'VERSION': 'debug:version',
     'OUTPUT': 'debug:output',
     'COLORS': 'action:colors',

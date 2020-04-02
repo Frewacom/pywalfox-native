@@ -69,7 +69,7 @@ class Daemon:
 
     def send_colorscheme(self):
         """Sends the current colorscheme to the addon."""
-        (success, data) = fetcher.get_colorscheme(PYWAL_COLORS_PATH, BG_LIGHT_MODIFIER)
+        (success, data) = fetcher.get_colorscheme()
         self.messenger.send_message(Message(ACTIONS['COLORS'], data, success=success))
 
     def send_invalid_action(self):
@@ -118,15 +118,15 @@ class Daemon:
         """
         try:
             action = message['action']
-            if action == actions[ACTIONS['VERSION']]: 
+            if action == actions[ACTIONS['VERSION']]:
                 self.send_version()
-            elif action == actions[ACTIONS['COLORS']]: 
+            elif action == actions[ACTIONS['COLORS']]:
                 self.send_colorscheme()
-            elif action == actions[ACTIONS['CSS_ENABLE']]: 
+            elif action == actions[ACTIONS['CSS_ENABLE']]:
                 self.send_enable_css_response()
-            elif action == actions[ACTIONS['CSS_DISABLE']]: 
+            elif action == actions[ACTIONS['CSS_DISABLE']]:
                 self.send_disable_css_response()
-            else: 
+            else:
                 logging.debug('%s: no such action' % action)
                 self.send_invalid_action()
         except KeyError:

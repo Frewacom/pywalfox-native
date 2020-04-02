@@ -6,7 +6,8 @@ import logging
 import argparse
 import subprocess
 
-from config import DAEMON_VERSION
+import install
+from config import DAEMON_VERSION, LOG_FILE_PATH
 from daemon import Daemon
 
 if sys.platform.startswith('win32'):
@@ -32,6 +33,9 @@ def handle_exit_args(args):
         open_log_file()
         sys.exit(1)
 
+    if args.action == 'setup':
+        install.start_setup()
+
     if args.version:
         print_version()
         sys.exit(1)
@@ -45,7 +49,7 @@ def get_python_version():
         sys.exit(0)
     else:
         logging.debug('Using python %s' % version_label)
-    
+
     return python_version
 
 def send_update_action():
@@ -58,14 +62,13 @@ def send_update_action():
 
 def open_log_file():
     """Opens the daemon log file in an editor."""
-    if os.path.isfile(LOG_FILE):
-        file_path = os.path.join(os.getcwd(), LOG_FILE)
-        editor = 'nano'
-        
+    if os.path.isfile(LOG_FILE_PATH):
         if not sys.platform.startswith('win32'):
             editor = os.getenv('EDITOR', 'vi')
+        else:
+            editor = 'nano' # fallback
 
-        subprocess.run([editor, file_path])
+        subprocess.run([editor, LOG_FILE_PATH])
     else:
         print('No log file exists')
 
