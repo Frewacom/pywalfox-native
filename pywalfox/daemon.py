@@ -118,14 +118,14 @@ class Daemon:
         """
         try:
             action = message['action']
-            if action == actions[ACTIONS['VERSION']]:
+            if action == ACTIONS['VERSION']:
                 self.send_version()
-            elif action == actions[ACTIONS['COLORS']]:
+            elif action == ACTIONS['COLORS']:
                 self.send_colorscheme()
-            elif action == actions[ACTIONS['CSS_ENABLE']]:
-                self.send_enable_css_response()
-            elif action == actions[ACTIONS['CSS_DISABLE']]:
-                self.send_disable_css_response()
+            elif action == ACTIONS['CSS_ENABLE']:
+                self.send_enable_css_response(message)
+            elif action == ACTIONS['CSS_DISABLE']:
+                self.send_disable_css_response(message)
             else:
                 logging.debug('%s: no such action' % action)
                 self.send_invalid_action()

@@ -1,3 +1,3 @@
 @echo off
 
-python -u pywalfox
+python -u ../pywalfox

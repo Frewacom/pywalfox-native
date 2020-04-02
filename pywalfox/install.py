@@ -2,7 +2,7 @@ import os
 import sys
 import shutil
 import logging
-from config import APP_PATH, MANIFEST_PATH
+from config import APP_PATH
 
 def win_setup():
     pass
