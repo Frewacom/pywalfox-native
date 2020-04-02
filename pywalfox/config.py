@@ -8,7 +8,7 @@ WIN_SOCKET_HOST = ('127.0.0.1', 56744)
 HOME_PATH=os.getenv('XDG_CONFIG_HOME', os.path.expanduser('~'))
 PYWAL_COLORS_PATH=os.path.join(HOME_PATH, '.cache/wal/colors')
 
-APP_PATH=os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+APP_PATH=os.path.dirname(os.path.abspath(__file__))
 CSS_PATH=os.path.join(APP_PATH, 'assets/css')
 
 LOG_FILE_PATH=os.path.join(APP_PATH, 'daemon.log')
