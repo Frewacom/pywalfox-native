@@ -6,7 +6,6 @@ import logging
 import argparse
 import subprocess
 
-import install
 from config import DAEMON_VERSION, LOG_FILE_PATH
 from daemon import Daemon
 
@@ -34,7 +33,8 @@ def handle_exit_args(args):
         sys.exit(1)
 
     if args.action == 'setup':
-        install.start_setup()
+        from install import start_setup
+        start_setup()
 
     if args.version:
         print_version()
