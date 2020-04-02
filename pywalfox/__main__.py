@@ -6,15 +6,15 @@ import logging
 import argparse
 import subprocess
 
-from config import DAEMON_VERSION, LOG_FILE_PATH
-from daemon import Daemon
+from .config import DAEMON_VERSION, LOG_FILE_PATH
+from .daemon import Daemon
 
 if sys.platform.startswith('win32'):
-    from channel.win.client import Client
+    from .channel.win.client import Client
 else:
-    from channel.unix.client import Client
+    from .channel.unix.client import Client
 
-from utils.logger import *
+from .utils.logger import *
 
 parser = argparse.ArgumentParser(description='Pywalfox - Native messaging host')
 parser.add_argument('action', nargs='?', default='none', help='sends a message to the addon telling it to update the theme')
@@ -33,7 +33,7 @@ def handle_exit_args(args):
         sys.exit(1)
 
     if args.action == 'setup':
-        from install import start_setup
+        from pywalfox.install import start_setup
         start_setup()
 
     if args.version:

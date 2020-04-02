@@ -2,7 +2,8 @@ import os
 import sys
 import shutil
 import logging
-from config import APP_PATH, HOME_PATH
+
+from .config import APP_PATH, HOME_PATH
 
 # We only need these variables when running the setup, so might as well define them here.
 MANIFEST_SRC_PATH=os.path.join(APP_PATH, 'assets/manifest.json')

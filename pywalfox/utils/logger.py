@@ -1,7 +1,7 @@
 import logging
 from logging.handlers import RotatingFileHandler
 
-from config import *
+from ..config import *
 
 def create_rotating_log(name, log_level):
     """

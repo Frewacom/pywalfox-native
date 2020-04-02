@@ -3,14 +3,14 @@ import sys
 import socket
 import logging
 
-from config import UNIX_SOCKET_PATH, WIN_SOCKET_HOST
+from ..config import UNIX_SOCKET_PATH, WIN_SOCKET_HOST
 
 class Connector:
     """
     Base class for the socket server and client.
-    Depending on the current OS, a different socket type will be used, 
-    since UNIX-sockets are not properly supported on Windows. 
-    
+    Depending on the current OS, a different socket type will be used,
+    since UNIX-sockets are not properly supported on Windows.
+
     :param platform_id str: the current platform identifier, e.g. win32
     """
     def __init__(self, platform_id):

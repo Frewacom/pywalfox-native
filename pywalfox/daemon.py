@@ -2,17 +2,17 @@ import sys
 import logging
 from threading import Thread
 
-import fetcher as fetcher
-import custom_css as custom_css
+from .fetcher import *
+from .custom_css import *
 
-from config import *
-from response import Message
-from messenger import Messenger
+from .config import *
+from .response import Message
+from .messenger import Messenger
 
 if sys.platform.startswith('win32'):
-    from channel.win.server import Server
+    from .channel.win.server import Server
 else:
-    from channel.unix.server import Server
+    from .channel.unix.server import Server
 
 class Daemon:
     """
@@ -29,7 +29,7 @@ class Daemon:
 
     def set_chrome_path(self):
         """Tries to set the path to the chrome directory."""
-        self.chrome_path = custom_css.get_firefox_chrome_path()
+        self.chrome_path = get_firefox_chrome_path()
 
     def check_chrome_path(self, action):
         """
@@ -94,7 +94,7 @@ class Daemon:
         target = self.check_target(message)
         if target is not False:
             if self.check_chrome_path(action):
-                (success, message) = custom_css.enable_custom_css(self.chrome_path, target)
+                (success, message) = enable_custom_css(self.chrome_path, target)
                 self.messenger.send_message(Message(action, message, success=success))
 
     def send_disable_css_response(self, message):
@@ -107,7 +107,7 @@ class Daemon:
         target = self.check_target(message)
         if target is not False:
             if self.check_chrome_path(action):
-                (success, message) = custom_css.disable_custom_css(self.chrome_path, target)
+                (success, message) = disable_custom_css(self.chrome_path, target)
                 self.messenger.send_message(Message(action, message, success=success))
 
     def handle_message(self, message):

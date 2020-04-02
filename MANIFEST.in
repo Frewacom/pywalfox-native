@@ -1,0 +1,6 @@
+include pywalfox/utils/*
+include pywalfox/channel/*
+include pywalfox/channel/unix/*
+include pywalfox/channel/win/*
+include README.md
+include LICENSE.md

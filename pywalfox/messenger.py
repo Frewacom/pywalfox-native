@@ -3,7 +3,7 @@ import json
 import struct
 import logging
 
-from config import DAEMON_VERSION, ACTIONS
+from .config import DAEMON_VERSION, ACTIONS
 
 class Messenger:
     """

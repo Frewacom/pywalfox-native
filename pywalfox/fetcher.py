@@ -1,8 +1,8 @@
 import os
 import logging
 
-from config import PYWAL_COLORS_PATH, BG_LIGHT_MODIFIER
-from utils.colors import generate_brighter_shade
+from .config import PYWAL_COLORS_PATH, BG_LIGHT_MODIFIER
+from .utils.colors import generate_brighter_shade
 
 def get_colorscheme():
     """

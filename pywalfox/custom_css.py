@@ -2,7 +2,8 @@ import os
 import glob
 import shutil
 import logging
-from config import CSS_PATH
+
+from .config import CSS_PATH
 
 def get_firefox_chrome_path():
     """
