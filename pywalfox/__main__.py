@@ -17,13 +17,19 @@ else:
 from .utils.logger import *
 
 parser = argparse.ArgumentParser(description='Pywalfox - Native messaging host')
-parser.add_argument('action', nargs='?', default='none', help='sends a message to the addon telling it to update the theme')
+parser.add_argument('action', nargs='?', default=None, help='available options are setup, update, daemon and log')
+parser.add_argument('-t', '--target', nargs='?', default=None, dest='target_browser', help='the browser where the manifest should be installed')
+parser.add_argument('-u', '--user', dest='user_only', action='store_true', help='install for the current user only')
 parser.add_argument('--verbose', dest='verbose', action='store_true', help='runs the daemon in verbose mode with debugging output')
 parser.add_argument('-p', '--print', dest='print_mode', action='store_true', help='prints the debugging output instead of writing to logfile')
 parser.add_argument('-v', '--version', dest='version', action='store_true', help='displays the current version of the daemon')
 
-def handle_exit_args(args):
-    """Handles arguments that exit."""
+def handle_args(args):
+    """Handles CLI arguments."""
+    if args.version:
+        print_version()
+        sys.exit(1)
+
     if args.action == 'update':
         send_update_action()
         sys.exit(1)
@@ -33,12 +39,23 @@ def handle_exit_args(args):
         sys.exit(1)
 
     if args.action == 'setup':
-        from pywalfox.install import start_setup
-        start_setup()
+        if args.target_browser == None:
+            print('You did not specify which browser to install the manifest to.')
+            print('Available targets are: firefox, chrome, chromium')
+            print('')
+            print('Example usage: pywalfox setup --target firefox')
+            sys.exit(1)
+        else:
+            from pywalfox.install import start_setup
+            start_setup(args.target_browser, args.user_only)
+            sys.exit(1)
 
-    if args.version:
-        print_version()
+    if args.action == 'daemon':
+        setup_logging(args.verbose, args.print_mode)
+        run_daemon()
         sys.exit(1)
+
+    parser.print_help()
 
 def get_python_version():
     """Gets the current python version and checks if it is supported."""
@@ -76,18 +93,18 @@ def print_version():
     """Prints the current version of the daemon."""
     print('v%s' % DAEMON_VERSION)
 
-def main():
-    """Handles arguments and starts the daemon."""
-    args = parser.parse_args()
-    handle_exit_args(args)
-
-    setup_logging(args.verbose, args.print_mode)
-
+def run_daemon():
+    """Starts the daemon."""
     python_version = get_python_version()
 
     daemon = Daemon(python_version.major)
     daemon.start()
     daemon.close()
+
+def main():
+    """Application entry point."""
+    args = parser.parse_args()
+    handle_args(args)
 
 if __name__ == '__main__':
     main()

@@ -7,7 +7,7 @@ from .config import DAEMON_VERSION, ACTIONS
 
 class Messenger:
     """
-    Handles the sending and receiving of messages to and from the addon using stdio.
+    Handles the sending and receiving of messages to and from the extension using stdio.
 
     :param version str: the current major python version
     """
@@ -53,7 +53,7 @@ class Messenger:
 
     def get_message(self):
         """
-        Reads message from addon in stdin.
+        Reads message from extension in stdin.
 
         :return: the decoded message
         :rType: str

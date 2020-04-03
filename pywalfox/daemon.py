@@ -16,7 +16,7 @@ else:
 
 class Daemon:
     """
-    Application entry point. Initializes the application.
+    Implements the daemon functionality that communicates with the extension.
 
     :param python_version str: the current major python version
     """
@@ -64,29 +64,29 @@ class Daemon:
         return False
 
     def send_version(self):
-        """Sends the current daemon version to the addon."""
+        """Sends the current daemon version to the extension."""
         self.messenger.send_message(Message(ACTIONS['VERSION'], DAEMON_VERSION))
 
     def send_colorscheme(self):
-        """Sends the current colorscheme to the addon."""
+        """Sends the current colorscheme to the extension."""
         (success, data) = fetcher.get_colorscheme()
         self.messenger.send_message(Message(ACTIONS['COLORS'], data, success=success))
 
     def send_invalid_action(self):
-        """Sends an action to the addon indicating that the action sent was invalid"""
+        """Sends an action to the extension indicating that the action sent was invalid"""
         self.messenger.send_message(Message(ACTIONS['INVALID_ACTION'], {}, success=False))
 
     def send_output(self, message):
         """
-        Sends an output message to the addon that will be displayed in the 'Debugging output' area.
+        Sends an output message to the extension that will be displayed in the 'Debugging output' area.
 
-        :param message str: the message to send to the addon
+        :param message str: the message to send to the extension
         """
         self.messenger.send_message(Message(ACTIONS['OUTPUT'], message))
 
     def send_enable_css_response(self, message):
         """
-        Tries to enable a custom CSS file and sends the result to the addon.
+        Tries to enable a custom CSS file and sends the result to the extension.
 
         :param target string: the name of the CSS file to enable/disable
         """
@@ -99,7 +99,7 @@ class Daemon:
 
     def send_disable_css_response(self, message):
         """
-        Tries to disable a custom CSS file and sends the result to the addon.
+        Tries to disable a custom CSS file and sends the result to the extension.
 
         :param target string: the name of the CSS file to enable/disable
         """
@@ -161,7 +161,7 @@ class Daemon:
         try:
             while True:
                 message = self.messenger.get_message()
-                logging.debug('Received message from addon: %s' % message)
+                logging.debug('Received message from extension: %s' % message)
                 self.handle_message(message)
         except KeyboardInterrupt:
             return

@@ -4,7 +4,7 @@ class Message:
     """
     Defines the structure of a generic message.
 
-    :param action str: the action called by the addon
+    :param action str: the action called by the extension
     :param data any: the additional data to send along with the message
     :param success bool: if the action was successfull
     """
