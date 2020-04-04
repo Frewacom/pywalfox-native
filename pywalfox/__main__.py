@@ -6,7 +6,7 @@ import logging
 import argparse
 import subprocess
 
-from .config import DAEMON_VERSION, LOG_FILE_PATH
+from .config import DAEMON_VERSION, LOG_FILE_PATH, SUPPORTED_BROWSERS
 from .daemon import Daemon
 
 if sys.platform.startswith('win32'):
@@ -23,39 +23,6 @@ parser.add_argument('-u', '--user', dest='user_only', action='store_true', help=
 parser.add_argument('--verbose', dest='verbose', action='store_true', help='runs the daemon in verbose mode with debugging output')
 parser.add_argument('-p', '--print', dest='print_mode', action='store_true', help='prints the debugging output instead of writing to logfile')
 parser.add_argument('-v', '--version', dest='version', action='store_true', help='displays the current version of the daemon')
-
-def handle_args(args):
-    """Handles CLI arguments."""
-    if args.version:
-        print_version()
-        sys.exit(1)
-
-    if args.action == 'update':
-        send_update_action()
-        sys.exit(1)
-
-    if args.action == 'log':
-        open_log_file()
-        sys.exit(1)
-
-    if args.action == 'setup':
-        if args.target_browser == None:
-            print('You did not specify which browser to install the manifest to.')
-            print('Available targets are: firefox, chrome, chromium')
-            print('')
-            print('Example usage: pywalfox setup --target firefox')
-            sys.exit(1)
-        else:
-            from pywalfox.install import start_setup
-            start_setup(args.target_browser, args.user_only)
-            sys.exit(1)
-
-    if args.action == 'daemon':
-        setup_logging(args.verbose, args.print_mode)
-        run_daemon()
-        sys.exit(1)
-
-    parser.print_help()
 
 def get_python_version():
     """Gets the current python version and checks if it is supported."""
@@ -101,6 +68,40 @@ def run_daemon():
     daemon.start()
     daemon.close()
 
+def handle_args(args):
+    """Handles CLI arguments."""
+    if args.version:
+        print_version()
+        sys.exit(1)
+
+    if args.action == 'update':
+        send_update_action()
+        sys.exit(1)
+
+    if args.action == 'log':
+        open_log_file()
+        sys.exit(1)
+
+    if args.action == 'setup':
+        if args.target_browser == None:
+            print('You did not specify which browser to install the manifest to.')
+            print('Available targets are: %s' % SUPPORTED_BROWSERS)
+            print('')
+            print('Example usage: pywalfox setup --target firefox')
+            sys.exit(1)
+        else:
+            from pywalfox.install import start_setup
+            start_setup(args.target_browser, args.user_only)
+            sys.exit(1)
+
+    if args.action == 'daemon':
+        setup_logging(args.verbose, args.print_mode)
+        run_daemon()
+        sys.exit(1)
+
+    # If no action was specified
+    parser.print_help()
+
 def main():
     """Application entry point."""
     args = parser.parse_args()
@@ -108,11 +109,5 @@ def main():
 
 if __name__ == '__main__':
     main()
-
-
-
-
-
-
 
 

@@ -8,13 +8,28 @@ from .config import APP_PATH, HOME_PATH, BIN_PATH_UNIX, BIN_PATH_WIN
 # We only need these variables when running the setup, so might as well define them here.
 MANIFEST_SRC_PATH=os.path.join(APP_PATH, 'assets/manifest.json')
 MANIFEST_TARGET_NAME='pywalfox.json'
+
 MANIFEST_TARGET_PATHS_UNIX={
     'FIREFOX': os.path.join('/usr/lib/mozilla/native-messaging-hosts'),
     'CHROME': os.path.join('/etc/opt/chrome/native-messaging-hosts'),
     'CHROMIUM': os.path.join('/etc/chromium/native-messaging-hosts'),
+    'BRAVE': os.path.join('/etc/opt/chrome/native-messaging-hosts/'),
     'FIREFOX_USER': os.path.join(HOME_PATH, '.mozilla/native-messaging-hosts'),
     'CHROME_USER': os.path.join(HOME_PATH, 'google-chrome/NativeMessagingHosts'),
-    'CHROMIUM_USER': os.path.join(HOME_PATH, 'chromium/NativeMessagingHosts')
+    'CHROMIUM_USER': os.path.join(HOME_PATH, 'chromium/NativeMessagingHosts'),
+    'BRAVE_USER': os.path.join(HOME_PATH, 'BraveSoftware/Brave-Browser/NativeMessagingHosts/'),
+}
+
+MANIFEST_TARGET_PATHS_WIN={
+    # TODO: replace these paths with the actual Windows paths
+    'FIREFOX': os.path.join('/usr/lib/mozilla/native-messaging-hosts'),
+    'CHROME': os.path.join('/etc/opt/chrome/native-messaging-hosts'),
+    'CHROMIUM': os.path.join('/etc/chromium/native-messaging-hosts'),
+    'BRAVE': os.path.join('/etc/opt/chrome/native-messaging-hosts/'),
+    'FIREFOX_USER': os.path.join(HOME_PATH, '.mozilla/native-messaging-hosts'),
+    'CHROME_USER': os.path.join(HOME_PATH, 'google-chrome/NativeMessagingHosts'),
+    'CHROMIUM_USER': os.path.join(HOME_PATH, 'chromium/NativeMessagingHosts'),
+    'BRAVE_USER': os.path.join(HOME_PATH, 'BraveSoftware/Brave-Browser/NativeMessagingHosts/'),
 }
 
 def create_hosts_directory(hosts_path):
