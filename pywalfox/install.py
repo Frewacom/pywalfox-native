@@ -21,9 +21,8 @@ MANIFEST_TARGET_PATHS_WIN={
 }
 
 MANIFEST_TARGET_PATHS_DARWIN={
-    # TODO: Add real paths
-    'FIREFOX': os.path.join('/usr/lib/mozilla/native-messaging-hosts'),
-    'FIREFOX_USER': os.path.join(HOME_PATH, '.mozilla/native-messaging-hosts'),
+    'FIREFOX': os.path.join('/Library/Application Support/Mozilla/NativeMessagingHosts'),
+    'FIREFOX_USER': os.path.join(HOME_PATH, 'Library/Application Support/Mozilla/NativeMessagingHosts/'),
 }
 
 def create_hosts_directory(hosts_path):
