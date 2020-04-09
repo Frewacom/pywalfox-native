@@ -5,7 +5,7 @@ DAEMON_VERSION='2.0'
 UNIX_SOCKET_PATH='/tmp/pywalfox_socket'
 WIN_SOCKET_HOST = ('127.0.0.1', 56744)
 
-SUPPORTED_BROWSERS=['firefox', 'chrome', 'brave', 'chromium']
+SUPPORTED_BROWSERS=['firefox']
 
 HOME_PATH=os.getenv('XDG_CONFIG_HOME', os.path.expanduser('~'))
 PYWAL_COLORS_PATH=os.path.join(HOME_PATH, '.cache/wal/colors')

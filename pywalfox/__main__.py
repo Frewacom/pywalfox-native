@@ -18,8 +18,7 @@ from .utils.logger import *
 
 parser = argparse.ArgumentParser(description='Pywalfox - Native messaging host')
 parser.add_argument('action', nargs='?', default=None, help='available options are setup, update, daemon and log')
-parser.add_argument('-t', '--target', nargs='?', default=None, dest='target_browser', help='the browser where the manifest should be installed')
-parser.add_argument('-u', '--user', dest='user_only', action='store_true', help='install for the current user only')
+parser.add_argument('-g', '--global', dest='user_only', action='store_false', help='install for the current user only')
 parser.add_argument('--verbose', dest='verbose', action='store_true', help='runs the daemon in verbose mode with debugging output')
 parser.add_argument('-p', '--print', dest='print_mode', action='store_true', help='prints the debugging output instead of writing to logfile')
 parser.add_argument('-v', '--version', dest='version', action='store_true', help='displays the current version of the daemon')
@@ -83,16 +82,9 @@ def handle_args(args):
         sys.exit(1)
 
     if args.action == 'setup':
-        if args.target_browser == None:
-            print('You did not specify which browser to install the manifest to.')
-            print('Available targets are: %s' % SUPPORTED_BROWSERS)
-            print('')
-            print('Example usage: pywalfox setup --target firefox')
-            sys.exit(1)
-        else:
-            from pywalfox.install import start_setup
-            start_setup(args.target_browser, args.user_only)
-            sys.exit(1)
+        from pywalfox.install import start_setup
+        start_setup(args.user_only)
+        sys.exit(1)
 
     if args.action == 'daemon':
         setup_logging(args.verbose, args.print_mode)

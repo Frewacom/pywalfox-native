@@ -11,25 +11,19 @@ MANIFEST_TARGET_NAME='pywalfox.json'
 
 MANIFEST_TARGET_PATHS_UNIX={
     'FIREFOX': os.path.join('/usr/lib/mozilla/native-messaging-hosts'),
-    'CHROME': os.path.join('/etc/opt/chrome/native-messaging-hosts'),
-    'CHROMIUM': os.path.join('/etc/chromium/native-messaging-hosts'),
-    'BRAVE': os.path.join('/etc/opt/chrome/native-messaging-hosts/'),
     'FIREFOX_USER': os.path.join(HOME_PATH, '.mozilla/native-messaging-hosts'),
-    'CHROME_USER': os.path.join(HOME_PATH, 'google-chrome/NativeMessagingHosts'),
-    'CHROMIUM_USER': os.path.join(HOME_PATH, 'chromium/NativeMessagingHosts'),
-    'BRAVE_USER': os.path.join(HOME_PATH, 'BraveSoftware/Brave-Browser/NativeMessagingHosts/'),
 }
 
 MANIFEST_TARGET_PATHS_WIN={
-    # TODO: replace these paths with the actual Windows paths
+    # TODO: Add real paths
     'FIREFOX': os.path.join('/usr/lib/mozilla/native-messaging-hosts'),
-    'CHROME': os.path.join('/etc/opt/chrome/native-messaging-hosts'),
-    'CHROMIUM': os.path.join('/etc/chromium/native-messaging-hosts'),
-    'BRAVE': os.path.join('/etc/opt/chrome/native-messaging-hosts/'),
     'FIREFOX_USER': os.path.join(HOME_PATH, '.mozilla/native-messaging-hosts'),
-    'CHROME_USER': os.path.join(HOME_PATH, 'google-chrome/NativeMessagingHosts'),
-    'CHROMIUM_USER': os.path.join(HOME_PATH, 'chromium/NativeMessagingHosts'),
-    'BRAVE_USER': os.path.join(HOME_PATH, 'BraveSoftware/Brave-Browser/NativeMessagingHosts/'),
+}
+
+MANIFEST_TARGET_PATHS_DARWIN={
+    # TODO: Add real paths
+    'FIREFOX': os.path.join('/usr/lib/mozilla/native-messaging-hosts'),
+    'FIREFOX_USER': os.path.join(HOME_PATH, '.mozilla/native-messaging-hosts'),
 }
 
 def create_hosts_directory(hosts_path):
@@ -103,37 +97,19 @@ def set_executable_permissions(bin_path):
         print('Try setting the permissions manually using: chmod +x')
         sys.exit(0)
 
-def get_target_path_key(target_browser, user_only):
+def get_target_path_key(user_only):
     """
     Gets the path to the 'native-messaging-hosts' directory corresponding to
     the targeted browser in the CLI-argument.
 
-    :param target_browser str: the browser to install the manifest to
     :param user_only bool: if the manifest should be installed for the current user only
     :return: the key in MANIFEST_TARGET_PATHS_* corresponding to the manifest path
     :rType: str
     """
-    if target_browser == 'firefox':
-        if user_only == True:
-            return 'FIREFOX_USER'
-        else:
-            return 'FIREFOX'
-    if target_browser == 'chrome':
-        if user_only == True:
-            return 'CHROME_USER'
-        else:
-            return 'CHROME'
-    if target_browser == 'chromium':
-        if user_only == True:
-            return 'CHROMIUM_USER'
-        else:
-            return 'CHROMIUM'
+    if user_only == True:
+        return 'FIREFOX_USER'
     else:
-        print('The browser you selected is currently not (offically) supported by Pywalfox.')
-        print('')
-        print('If you want it to be added, you can create an issue on GitHub:')
-        print('https://github.com/Frewacom/pywalfox-native/issues')
-        sys.exit(0)
+        return 'FIREFOX'
 
 def win_setup(manifest_path_key):
     """
@@ -154,14 +130,13 @@ def unix_setup(manifest_path_key):
     copy_manifest(manifest_path, BIN_PATH_UNIX)
     set_executable_permissions(BIN_PATH_UNIX)
 
-def start_setup(target_browser, user_only):
+def start_setup(user_only):
     """
     Installs the native messaging host manifest.
 
-    :param target_browser str: the name of the browser to install the manifest to
     :param user_only str: if the manifest should be installed for the current user only
     """
-    manifest_path_key = get_target_path_key(target_browser, user_only)
+    manifest_path_key = get_target_path_key(user_only)
 
     if sys.platform.startswith('win32'):
         win_setup(manifest_path_key)
