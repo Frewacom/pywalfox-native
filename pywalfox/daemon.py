@@ -69,7 +69,7 @@ class Daemon:
 
     def send_colorscheme(self):
         """Sends the current colorscheme to the extension."""
-        (success, data) = fetcher.get_colorscheme()
+        (success, data) = get_colorscheme()
         self.messenger.send_message(Message(ACTIONS['COLORS'], data, success=success))
 
     def send_invalid_action(self):
