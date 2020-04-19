@@ -9,12 +9,14 @@ from .config import APP_PATH, HOME_PATH, BIN_PATH_UNIX, BIN_PATH_WIN
 MANIFEST_SRC_PATH=os.path.join(APP_PATH, 'assets/manifest.json')
 MANIFEST_TARGET_NAME='pywalfox.json'
 
+
+WIN_REGISTRY_PATH=r'Software\Mozilla\NativeMessagingHosts\pywalfox'
+MANIFEST_TARGET_PATH_WIN=os.path.join(HOME_PATH, '.pywalfox')
+
 MANIFEST_TARGET_PATHS_UNIX={
     'FIREFOX': os.path.join('/usr/lib/mozilla/native-messaging-hosts'),
     'FIREFOX_USER': os.path.join(HOME_PATH, '.mozilla/native-messaging-hosts'),
 }
-
-MANIFEST_TARGET_PATH_WIN=r'Software\Mozilla\NativeMessagingHosts\pywalfox'
 
 MANIFEST_TARGET_PATHS_DARWIN={
     'FIREFOX': os.path.join('/Library/Application Support/Mozilla/NativeMessagingHosts'),
@@ -43,6 +45,16 @@ def remove_existing_manifest(full_path):
         print('Could not remove existing manifest at: %s\n\t%s' % (full_path, str(e)))
         sys.exit(0)
 
+def normalize_path(target_path):
+    """
+    Replaces backslashes with forward slashes. 
+
+    :param target_path str: the path to normalize
+    :return: the normalized path
+    :rType: str
+    """
+    return (r'%s' % target_path).replace('\\', '/')
+
 def set_daemon_path(manifest_path, bin_path):
     """
     Replaces the '<path>' placeholder in the default manifest file with the path to the executable.
@@ -51,7 +63,7 @@ def set_daemon_path(manifest_path, bin_path):
     :param bin_path str: the path to the daemon executable
     """
     for line in fileinput.FileInput(manifest_path, inplace=1):
-        line = line.replace("<path>", bin_path)
+        line = line.replace("<path>", normalize_path(bin_path))
         print(line.rstrip('\n'))
 
 def copy_manifest(target_path, bin_path):
@@ -62,7 +74,6 @@ def copy_manifest(target_path, bin_path):
     :param bin_path str: the path to the daemon executable
     """
     full_path = os.path.join(target_path, MANIFEST_TARGET_NAME)
-
     create_hosts_directory(target_path)
     remove_existing_manifest(full_path)
 
@@ -122,12 +133,21 @@ def win_setup(manifest_path_key):
         hkey = winreg.HKEY_LOCAL_MACHINE
 
     try:
-        reg_key = winreg.OpenKey(hkey, MANIFEST_TARGET_PATH_WIN, 0, winreg.KEY_SET_VALUE)
+        reg_key = winreg.OpenKey(hkey, WIN_REGISTRY_PATH, 0, winreg.KEY_SET_VALUE)
+        print('Opened registry key with write permissions')
     except: 
-        reg_key = winreg.CreateKey(hkey, MANIFEST_TARGET_PATH_WIN)
+        reg_key = winreg.CreateKey(hkey, WIN_REGISTRY_PATH)
+        print('Created new registry key')
 
-    winreg.SetValue(reg_key, '', winreg.REG_SZ, MANIFEST_SRC_PATH)
-    # TODO: We must copy the manifest to some other path and replace the <path> placeholder with the executable path
+    try:
+        normalized_target_path = normalize_path(os.path.join(MANIFEST_TARGET_PATH_WIN, MANIFEST_TARGET_NAME))
+        winreg.SetValue(reg_key, '', winreg.REG_SZ, normalized_target_path)
+        print('Set value of registry to: %s' % normalized_target_path)
+    except Exception as e: 
+        print('Failed to set registry key')
+        return
+
+    copy_manifest(MANIFEST_TARGET_PATH_WIN, BIN_PATH_WIN)
 
 def unix_setup(manifest_path_key):
     """
