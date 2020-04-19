@@ -4,7 +4,7 @@ html {
 }
 
 #main-window {
-    --font-size: 0.85em !important;
+    --font-size: 12px !important;
     font-size: var(--font-size) !important;
     --background: var(--lwt-accent-color);
     --foreground: var(--arrowpanel-color);

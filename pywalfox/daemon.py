@@ -88,7 +88,7 @@ class Daemon:
         """
         Tries to enable a custom CSS file and sends the result to the extension.
 
-        :param target string: the name of the CSS file to enable/disable
+        :param message string: the name of the CSS file to enable/disable
         """
         action = ACTIONS['CSS_ENABLE']
         target = self.check_target(message)
@@ -101,7 +101,7 @@ class Daemon:
         """
         Tries to disable a custom CSS file and sends the result to the extension.
 
-        :param target string: the name of the CSS file to enable/disable
+        :param message string: the name of the CSS file to enable/disable
         """
         action = ACTIONS['CSS_DISABLE']
         target = self.check_target(message)
@@ -109,6 +109,20 @@ class Daemon:
             if self.check_chrome_path(action):
                 (success, message) = disable_custom_css(self.chrome_path, target)
                 self.messenger.send_message(Message(action, message, success=success))
+
+    def send_font_size_response(self, message):
+        """
+        Tries to set a custom font size in a CSS file.
+
+        :param message string: the name of the CSS file to change the font size in
+        """
+        action = ACTIONS['CSS_FONT_SIZE']
+        target = self.check_target(message)
+        if target is not False:
+            if self.check_chrome_path(action):
+                if 'size' in message:
+                    (success, message) = set_font_size(self.chrome_path, target, message['size'])
+                    self.messenger.send_message(Message(action, message, success=success))
 
     def handle_message(self, message):
         """
@@ -126,6 +140,8 @@ class Daemon:
                 self.send_enable_css_response(message)
             elif action == ACTIONS['CSS_DISABLE']:
                 self.send_disable_css_response(message)
+            elif action == ACTIONS['CSS_FONT_SIZE']:
+                self.send_font_size_response(message)
             else:
                 logging.debug('%s: no such action' % action)
                 self.send_invalid_action()

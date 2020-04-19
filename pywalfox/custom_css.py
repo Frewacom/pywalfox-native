@@ -1,7 +1,9 @@
 import os
+import re
 import glob
 import shutil
 import logging
+import fileinput
 
 from .config import CSS_PATH
 
@@ -63,6 +65,30 @@ def disable_custom_css(chrome_path, name):
     except Exception as e:
         logging.error('%s could not be disabled: %s' % filename, str(e))
         return (False, 'Could not remove custom CSS: %s' % str(e))
+
+def set_font_size(chrome_path, name, size):
+    """
+    Sets the default font size in a CSS file.
+
+    :param chrome_path str: the path to the chrome directory
+    :param name str: the name of the css file to disable
+    :param size int: the new font size
+    :return: (success, message)
+    :rType: tuple
+    """
+    filename = add_css_file_extension(name)
+    logging.debug('Setting font size to  %s in custom CSS file: %s' % (size, filename))
+    try:
+        for line in fileinput.input(os.path.join(chrome_path, filename), inplace=True):
+            if '--font-size:' in line:
+                print('    --font-size: %spx;' % size)
+            else:
+                print(line, end='')
+        return (True, 'Font size was set to: %s' % size)
+    except Exception as e:
+        error_msg = 'Could not set font size: %s' % str(e)
+        logging.error(error_msg)
+        return (False, error_msg)
 
 def add_css_file_extension(name):
     """
