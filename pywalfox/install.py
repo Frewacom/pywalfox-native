@@ -14,11 +14,7 @@ MANIFEST_TARGET_PATHS_UNIX={
     'FIREFOX_USER': os.path.join(HOME_PATH, '.mozilla/native-messaging-hosts'),
 }
 
-MANIFEST_TARGET_PATHS_WIN={
-    # TODO: Add real paths
-    'FIREFOX': os.path.join('/usr/lib/mozilla/native-messaging-hosts'),
-    'FIREFOX_USER': os.path.join(HOME_PATH, '.mozilla/native-messaging-hosts'),
-}
+MANIFEST_TARGET_PATH_WIN=r'Software\Mozilla\NativeMessagingHosts\pywalfox'
 
 MANIFEST_TARGET_PATHS_DARWIN={
     'FIREFOX': os.path.join('/Library/Application Support/Mozilla/NativeMessagingHosts'),
@@ -114,18 +110,42 @@ def win_setup(manifest_path_key):
     """
     Windows specific installation.
 
-    :param manifest_path_key str: the key in MANIFEST_TARGET_PATHS_WIN that corresponds to the target browser
+    :param manifest_path_key str: the key in MANIFEST_TARGET_PATHS_WIN that corresponds to the target path
     """
-    manifest_path = MANIFEST_TARGET_PATHS_WIN[manifest_path_key]
-    copy_manifest(manifest_path, BIN_PATH_WIN)
+    try:
+        import _winreg as winreg
+    except ImportError:
+        import winreg
+
+    hkey = winreg.HKEY_CURRENT_USER
+    if manifest_path_key == 'FIREFOX':
+        hkey = winreg.HKEY_LOCAL_MACHINE
+
+    try:
+        reg_key = winreg.OpenKey(hkey, MANIFEST_TARGET_PATH_WIN, 0, winreg.KEY_SET_VALUE)
+    except: 
+        reg_key = winreg.CreateKey(hkey, MANIFEST_TARGET_PATH_WIN)
+
+    winreg.SetValue(reg_key, '', winreg.REG_SZ, MANIFEST_SRC_PATH)
+    # TODO: We must copy the manifest to some other path and replace the <path> placeholder with the executable path
 
 def unix_setup(manifest_path_key):
     """
     UNIX specific installation.
 
-    :param manifest_path_key str: the key in MANIFEST_TARGET_PATHS_UNIX that corresponds to the target browser
+    :param manifest_path_key str: the key in MANIFEST_TARGET_PATHS_UNIX that corresponds to the target path
     """
     manifest_path = MANIFEST_TARGET_PATHS_UNIX[manifest_path_key]
+    copy_manifest(manifest_path, BIN_PATH_UNIX)
+    set_executable_permissions(BIN_PATH_UNIX)
+
+def darwin_setup(manifest_path_key):
+    """
+    Darwin specific installation.
+
+    :param manifest_path_key str: the key in MANIFEST_TARGET_PATHS_UNIX that corresponds to the target path
+    """
+    manifest_path = MANIFEST_TARGET_PATHS_DARWIN[manifest_path_key]
     copy_manifest(manifest_path, BIN_PATH_UNIX)
     set_executable_permissions(BIN_PATH_UNIX)
 
@@ -139,6 +159,8 @@ def start_setup(user_only):
 
     if sys.platform.startswith('win32'):
         win_setup(manifest_path_key)
+    elif sys.platform.startswith('darwin'):
+        darwin_setup(manifest_path_key)
     else:
         unix_setup(manifest_path_key)
 
