@@ -29,7 +29,7 @@ def get_python_version():
     version_label = '%s.%s.%s' % (python_version[0], python_version[1], python_version[2])
     if python_version < (2,7):
         logging.error('Python version %s is not supported' % version_label)
-        sys.exit(0)
+        sys.exit(1)
     else:
         logging.debug('Using python %s' % version_label)
 
@@ -71,25 +71,25 @@ def handle_args(args):
     """Handles CLI arguments."""
     if args.version:
         print_version()
-        sys.exit(1)
+        sys.exit(0)
 
     if args.action == 'update':
         send_update_action()
-        sys.exit(1)
+        sys.exit(0)
 
     if args.action == 'log':
         open_log_file()
-        sys.exit(1)
+        sys.exit(0)
 
     if args.action == 'setup':
         from pywalfox.install import start_setup
         start_setup(args.user_only)
-        sys.exit(1)
+        sys.exit(0)
 
     if args.action == 'daemon':
         setup_logging(args.verbose, args.print_mode)
         run_daemon()
-        sys.exit(1)
+        sys.exit(0)
 
     # If no action was specified
     parser.print_help()

@@ -43,11 +43,11 @@ def remove_existing_manifest(full_path):
             os.remove(full_path)
     except Exception as e:
         print('Could not remove existing manifest at: %s\n\t%s' % (full_path, str(e)))
-        sys.exit(0)
+        sys.exit(1)
 
 def normalize_path(target_path):
     """
-    Replaces backslashes with forward slashes. 
+    Replaces backslashes with forward slashes.
 
     :param target_path str: the path to normalize
     :return: the normalized path
@@ -82,7 +82,7 @@ def copy_manifest(target_path, bin_path):
         print('Copied manifest to: %s' % full_path)
     except Exception as e:
         print('Could not copy manifest to: %s\n\t%s' % (full_path, str(e)))
-        sys.exit(0)
+        sys.exit(1)
 
     set_daemon_path(full_path, bin_path)
 
@@ -101,7 +101,7 @@ def set_executable_permissions(bin_path):
         print('Failed to set executable permissions on: %s\n\t%s' % (bin_path, str(e)))
         print('')
         print('Try setting the permissions manually using: chmod +x')
-        sys.exit(0)
+        sys.exit(1)
 
 def get_target_path_key(user_only):
     """
@@ -135,7 +135,7 @@ def win_setup(manifest_path_key):
     try:
         reg_key = winreg.OpenKey(hkey, WIN_REGISTRY_PATH, 0, winreg.KEY_SET_VALUE)
         print('Opened registry key with write permissions')
-    except: 
+    except:
         reg_key = winreg.CreateKey(hkey, WIN_REGISTRY_PATH)
         print('Created new registry key')
 
@@ -143,7 +143,7 @@ def win_setup(manifest_path_key):
         normalized_target_path = normalize_path(os.path.join(MANIFEST_TARGET_PATH_WIN, MANIFEST_TARGET_NAME))
         winreg.SetValue(reg_key, '', winreg.REG_SZ, normalized_target_path)
         print('Set value of registry to: %s' % normalized_target_path)
-    except Exception as e: 
+    except Exception as e:
         print('Failed to set registry key')
         return
 
