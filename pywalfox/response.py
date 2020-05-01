@@ -7,11 +7,13 @@ class Message:
     :param action str: the action called by the extension
     :param data any: the additional data to send along with the message
     :param success bool: if the action was successfull
+    :param error str: the error message if success is False
     """
-    def __init__(self, action, data, success=True):
+    def __init__(self, action, data=None, success=True, error=None):
         self.action = action
         self.success = success
         self.data = data
+        self.error = error
 
     def getMessage(self):
         """Creates the response message."""
@@ -20,10 +22,11 @@ class Message:
             'success': self.success
         }
 
-        if self.success == True:
+        if self.data is not None:
             message['data'] = self.data
-        else:
-            message['error'] = self.data
+
+        if self.error is not None:
+            message['error'] = self.error
 
         logging.debug('Created message: %s' % message)
         return message

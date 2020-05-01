@@ -65,16 +65,16 @@ class Daemon:
 
     def send_version(self):
         """Sends the current daemon version to the extension."""
-        self.messenger.send_message(Message(ACTIONS['VERSION'], DAEMON_VERSION))
+        self.messenger.send_message(Message(ACTIONS['VERSION'], data=DAEMON_VERSION))
 
     def send_colorscheme(self):
         """Sends the current colorscheme to the extension."""
-        (success, data) = get_colorscheme()
-        self.messenger.send_message(Message(ACTIONS['COLORS'], data, success=success))
+        (success, colorscheme) = get_colorscheme()
+        self.messenger.send_message(Message(ACTIONS['COLORS'], data=colorscheme, success=success))
 
     def send_invalid_action(self):
         """Sends an action to the extension indicating that the action sent was invalid"""
-        self.messenger.send_message(Message(ACTIONS['INVALID_ACTION'], {}, success=False))
+        self.messenger.send_message(Message(ACTIONS['INVALID_ACTION'], success=False))
 
     def send_output(self, message):
         """
@@ -82,7 +82,7 @@ class Daemon:
 
         :param message str: the message to send to the extension
         """
-        self.messenger.send_message(Message(ACTIONS['OUTPUT'], message))
+        self.messenger.send_message(Message(ACTIONS['OUTPUT'], data=message))
 
     def send_enable_css_response(self, message):
         """
@@ -95,7 +95,12 @@ class Daemon:
         if target is not False:
             if self.check_chrome_path(action):
                 (success, message) = enable_custom_css(self.chrome_path, target)
-                self.messenger.send_message(Message(action, message, success=success))
+                self.messenger.send_message(Message(
+                    action,
+                    data=target,
+                    success=success,
+                    error=message
+                ))
 
     def send_disable_css_response(self, message):
         """
@@ -108,7 +113,12 @@ class Daemon:
         if target is not False:
             if self.check_chrome_path(action):
                 (success, message) = disable_custom_css(self.chrome_path, target)
-                self.messenger.send_message(Message(action, message, success=success))
+                self.messenger.send_message(Message(
+                    action,
+                    data=target,
+                    success=success,
+                    error=message
+                ))
 
     def send_font_size_response(self, message):
         """
@@ -122,7 +132,12 @@ class Daemon:
             if self.check_chrome_path(action):
                 if 'size' in message:
                     (success, message) = set_font_size(self.chrome_path, target, message['size'])
-                    self.messenger.send_message(Message(action, message, success=success))
+                    self.messenger.send_message(Message(
+                        action,
+                        data=target,
+                        success=success,
+                        error=message
+                    ))
 
     def handle_message(self, message):
         """
