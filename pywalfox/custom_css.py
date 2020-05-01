@@ -44,7 +44,7 @@ def enable_custom_css(chrome_path, name):
         logging.debug('%s was enabled' % filename)
         return (True, 'Custom CSS: "%s" has been enabled' % filename)
     except Exception as e:
-        logging.error('%s could not be enabled: %s' % filename, str(e))
+        logging.error('%s could not be enabled: %s' % (filename, str(e)))
         return (False, 'Could not copy custom CSS to folder: %s' % str(e))
 
 def disable_custom_css(chrome_path, name):
@@ -63,7 +63,7 @@ def disable_custom_css(chrome_path, name):
         logging.debug('%s was disabled' % filename)
         return (True, 'Custom CSS: "%s" has been disabled' % filename)
     except Exception as e:
-        logging.error('%s could not be disabled: %s' % filename, str(e))
+        logging.error('%s could not be disabled: %s' % (filename, str(e)))
         return (False, 'Could not remove custom CSS: %s' % str(e))
 
 def set_font_size(chrome_path, name, size):
