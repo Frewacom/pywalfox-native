@@ -99,7 +99,7 @@ class Daemon:
                     action,
                     data=target,
                     success=success,
-                    error=message
+                    message=message
                 ))
 
     def send_disable_css_response(self, message):
@@ -117,7 +117,7 @@ class Daemon:
                     action,
                     data=target,
                     success=success,
-                    error=message
+                    message=message
                 ))
 
     def send_font_size_response(self, message):
@@ -136,7 +136,7 @@ class Daemon:
                         action,
                         data=target,
                         success=success,
-                        error=message
+                        message=message
                     ))
 
     def handle_message(self, message):

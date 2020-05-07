@@ -9,11 +9,11 @@ class Message:
     :param success bool: if the action was successfull
     :param error str: the error message if success is False
     """
-    def __init__(self, action, data=None, success=True, error=None):
+    def __init__(self, action, data=None, success=True, message=None):
         self.action = action
         self.success = success
         self.data = data
-        self.error = error
+        self.message = message
 
     def getMessage(self):
         """Creates the response message."""
@@ -25,8 +25,11 @@ class Message:
         if self.data is not None:
             message['data'] = self.data
 
-        if self.error is not None:
-            message['error'] = self.error
+        if self.message is not None:
+            if self.success is True:
+                message['message'] = self.message
+            else:
+                message['error'] = self.message
 
         logging.debug('Created message: %s' % message)
         return message
