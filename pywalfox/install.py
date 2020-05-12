@@ -64,9 +64,12 @@ def set_daemon_path(manifest_path, bin_path):
     :param manifest_path str: the path to the manifest
     :param bin_path str: the path to the daemon executable
     """
+    normalized_path = normalize_path(bin_path)
     for line in fileinput.FileInput(manifest_path, inplace=1):
-        line = line.replace("<path>", normalize_path(bin_path))
+        line = line.replace("<path>", normalized_path)
         print(line.rstrip('\n'))
+
+    print('Set daemon executable path to: %s' % normalized_path)
 
 def copy_manifest(target_path, bin_path):
     """
@@ -99,6 +102,7 @@ def set_executable_permissions(bin_path):
         mode = os.stat(bin_path).st_mode
         mode |= (mode & 0o444) >> 2    # copy R bits to X
         os.chmod(bin_path, mode)
+        print('Set execute permissions on daemon executable')
     except Exception as e:
         print('Failed to set executable permissions on: %s\n\t%s' % (bin_path, str(e)))
         print('')
@@ -227,16 +231,16 @@ def start_uninstall(user_only):
     :param user_only bool: if the manifest should be installed for the current user only
     """
     manifest_path_key = get_target_path_key(user_only)
-    full_manifest_path = get_full_manifest_path(manifest_path)
 
     if sys.platform.startswith('win32'):
-        manifest_path = MANIFEST_TARGET_PATH_WIN[manifest_path_key]
+        manifest_path = MANIFEST_TARGET_PATH_WIN
         delete_registry_keys(manifest_path_key)
     elif sys.platform.startswith('darwin'):
         manifest_path = MANIFEST_TARGET_PATHS_DARWIN[manifest_path_key]
     else:
-        manifest_path = MANIFEST_TARGET_PATH_UNIX[manifest_path_key]
+        manifest_path = MANIFEST_TARGET_PATHS_UNIX[manifest_path_key]
 
+    full_manifest_path = get_full_manifest_path(manifest_path)
     remove_existing_manifest(full_manifest_path)
 
 

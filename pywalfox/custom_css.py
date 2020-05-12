@@ -42,7 +42,7 @@ def enable_custom_css(chrome_path, name):
     try:
         shutil.copy(os.path.join(CSS_PATH, filename), os.path.join(chrome_path, filename))
         logging.debug('%s was enabled' % filename)
-        return (True, 'Custom CSS: "%s" has been enabled' % filename)
+        return (True, 'Custom CSS: %s has been enabled' % filename)
     except Exception as e:
         logging.error('%s could not be enabled: %s' % (filename, str(e)))
         return (False, 'Could not copy custom CSS to folder: %s' % str(e))
@@ -61,7 +61,7 @@ def disable_custom_css(chrome_path, name):
     try:
         os.remove(os.path.join(chrome_path, filename))
         logging.debug('%s was disabled' % filename)
-        return (True, 'Custom CSS: "%s" has been disabled' % filename)
+        return (True, 'Custom CSS: %s has been disabled' % filename)
     except Exception as e:
         logging.error('%s could not be disabled: %s' % (filename, str(e)))
         return (False, 'Could not remove custom CSS: %s' % str(e))
@@ -77,7 +77,7 @@ def set_font_size(chrome_path, name, size):
     :rType: tuple
     """
     filename = add_css_file_extension(name)
-    logging.debug('Setting font size to  %s in custom CSS file: %s' % (size, filename))
+    logging.debug('Setting font size to %s in custom CSS file: %s' % (size, filename))
     try:
         for line in fileinput.input(os.path.join(chrome_path, filename), inplace=True):
             if '--pywalfox-font-size:' in line:
