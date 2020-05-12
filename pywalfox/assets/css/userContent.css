@@ -20,6 +20,7 @@ html {
     --newtab-textbox-background-color: var(--pywalfox-lighter-background) !important;
     --newtab-contextmenu-button-color: var(--pywalfox-background) !important;
     --newtab-contextmenu-background-color: var(--pywalfox-background-light) !important;
+    --trailhead-cards-background-color: var(--pywalfox-lighter-background) !important;
   }
 
   .top-site-outer .title span, .top-site-outer .default-icon[data-fallback]::before,
