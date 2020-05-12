@@ -1,144 +1,66 @@
-/* Makes all scrollbars thin and less noticeable, however, this doesn't remove them completely. */
-html {
-    scrollbar-width: thin !important;
-}
-
+/******************** BEGIN PYWALFOX CUSTOM CSS ********************/
 #main-window {
-    --font-size: 12px !important;
-    font-size: var(--font-size) !important;
-    --background: var(--lwt-accent-color);
-    --foreground: var(--arrowpanel-color);
-    --accent-primary: var(--lwt-toolbar-field-highlight);
+  --pywalfox-font-size: 13px;
+  --pywalfox-font-size-sm: calc(var(--pywalfox-font-size) * 0.9);
+  --pywalfox-background: var(--lwt-toolbarbutton-active-background);
+  --pywalfox-background-light: var(--arrowpanel-background);
+  --pywalfox-text: var(--arrowpanel-color);
+  --pywalfox-unselected-tab-opacity: 0.8;
+  --pywalfox-darker-background: rgba(0, 0, 0, 0.4);
+  --pywalfox-padding: 4px 8px;
+  font-size: var(--pywalfox-font-size) !important;
 }
 
-.toolbarbutton-text, .tab-label {
-    font-size: var(--font-size) !important;
+/* Disable default appearance of certain elements to be able to override shadow DOM attributes */
+menupopup, menuseparator, button, search-textbox {
+  -moz-appearance: none !important;
 }
 
-/* Remove underline from container tabs */
-.tabbrowser-tab[usercontextid] .tab-bottom-line {
-    display: none !important;
+/* Override the default appearance of buttons and textboxes to match the pywalfox theme */
+button, search-textbox, menuitem[_moz-menuactive="true"], menuseparator {
+  background-color: var(--pywalfox-darker-background) !important;
 }
 
-/* Tab context menu */
-.arrowscrollbox-scrollbox {
-    background: var(--background) !important;
-    color: var(--foreground) !important;
+/* Separators in dropwdown menus */
+menuseparator {
+  height: 1px;
 }
 
-/* History right click context menu */
-.popup-internal-box {
-    background: var(--background) !important;
-    color: var(--foreground) !important;
+/* Elements where we set appearance to none, we need to set padding manually */
+notification, button, search-textbox {
+  padding: var(--pywalfox-padding) !important;
 }
 
-#urlbar-input-container {
-    font-size: calc(var(--font-size) * 1.15) !important;
+/* Fix background color of elements that can not be targeted via the Theme API */
+notification, menupopup {
+  background: var(--pywalfox-background-light) !important;
+  color: var(--pywalfox-text) !important;
 }
 
-#downloadsPanel, #widget-overflow, #appMenu-popup, #customizationui-widget-panel {
-    margin-top: -7px;
+/* Apply bold text to elements */
+textbox, panelview, .tabbrowser-tab, #sidebar-header,
+.findbar-container, toolbar[overflowable] > .customization-target {
+  font-weight: bold !important;
 }
 
-.tabbrowser-tab {
-    font-weight: bold !important;
-    font-size: var(--font-size) !important;
-}
-
+/* Decrease opacity of unselected tabs to match the default Firefox theme */
 .tabbrowser-tab:not([visuallyselected="true"]) {
-    opacity: 0.8 !important;
+  opacity: var(--pywalfox-unselected-tab-opacity) !important;
 }
 
-.tabbrowser-tab::before,.tabbrowser-tab::after{
-    display: none !important;
+/* Hide unnecessary borders */
+.sidebar-splitter, notification {
+  border: 0px !important;
 }
 
-/* The buttons inside the urlbar */
-#page-action-buttons {
-    opacity: 0.5 !important;
-}
-
-/* The border inside the urlbar between some of the action buttons */
-#page-action-buttons > :not([hidden]):not(toolbartabstop) ~ #pageActionSeparator {
-    margin: 0px !important;
-    visibility: hidden !important;
-}
-
-/* Search autocomplete suggestions */
-#PopupAutoCompleteRichResult .autocomplete-richlistitem {
-    font-size: calc(var(--font-size) * 1.05) !important;
-}
-
-/* Colors of the bookmarks and overflow menu icon  */
-toolbar[overflowable] > .customization-target {
-    font-weight: bold !important;
-    font-size: var(--font-size) !important;
-}
-
-#sidebar-header {
-    border-bottom: 0px !important;
-    font-weight: bold !important;
-}
-
+/* Change the background color of the resize splitter on the right side of the sidebar */
 .sidebar-splitter {
-    width: 0px !important;
-    border: 0px !important;
+  background-color: transparent !important;
 }
 
-textbox {
-    -moz-appearance: none !important;
-    font-weight: bold !important;
-}
-
-.findbar-container {
-    font-weight: bold !important;
-    font-size: smaller !important;
-}
-
+/* Smaller font size in panel dropdown menus */
 panelmultiview {
-    font-size: smaller !important;
+  font-size: var(--pywalfox-font-size-sm) !important;
 }
-
-button {
-    -moz-appearance: none !important;
-}
-
-panelview {
-    background: var(--background) !important;
-    color: var(--foreground) !important;
-    font-weight: bold !important;
-}
-
-#urlbar, .searchbar-textbox {
-    box-shadow: none !important;
-}
-
-/* Hover on buttons in dropdown menus */
-panelview .toolbarbutton-1:not(:-moz-any([disabled], [open], :active)):-moz-any(:hover, :focus),
-toolbarbutton.subviewbutton:not(:-moz-any([disabled], [open], :active)):-moz-any(:hover, :focus),
-.navigable.subviewbutton:not(:-moz-any([disabled], [open], :active)):-moz-any(:hover, :focus),
-menu.subviewbutton:not(:-moz-any([disabled], :active))[_moz-menuactive],
-menuitem.subviewbutton:not(:-moz-any([disabled], :active))[_moz-menuactive],
-.widget-overflow-list .toolbarbutton-1:not(:-moz-any([disabled], [open],
-:active)):-moz-any(:hover, :focus),
-.toolbaritem-combined-buttons:-moz-any(:not([cui-areatype="toolbar"]),
-[overflowedItem="true"]) > toolbarbutton:not(:-moz-any([disabled], [open],
-:active)):-moz-any(:hover, :focus) {
-    color: var(--background) !important;
-    background-color: var(--foreground) !important;
-}
-
-.bookmark-item {
-    fill: var(--accent-primary) !important;
-}
-
-.menu-text, .menu-iconic-left, .menu-iconic-text {
-    font-size: calc(var(--font-size) * 1.05);
-    color: white !important;
-}
-
-/* Remove the top border when hovering over a tab */
-#TabsToolbar[brighttext] .tabbrowser-tab:hover > .tab-stack > .tab-background > .tab-line:not([selected="true"]):not([multiselected]) {
-    display: none !important;
-}
+/********************* END PYWALFOX CUSTOM CSS *********************/
 

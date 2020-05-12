@@ -80,8 +80,8 @@ def set_font_size(chrome_path, name, size):
     logging.debug('Setting font size to  %s in custom CSS file: %s' % (size, filename))
     try:
         for line in fileinput.input(os.path.join(chrome_path, filename), inplace=True):
-            if '--font-size:' in line:
-                print('    --font-size: %spx;' % size)
+            if '--pywalfox-font-size:' in line:
+                print('    --pywalfox-font-size: %spx;' % size)
             else:
                 print(line, end='')
         return (True, 'Font size was set to: %s' % size)
