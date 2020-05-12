@@ -9,7 +9,6 @@ from .config import APP_PATH, HOME_PATH, BIN_PATH_UNIX, BIN_PATH_WIN
 MANIFEST_SRC_PATH=os.path.join(APP_PATH, 'assets/manifest.json')
 MANIFEST_TARGET_NAME='pywalfox.json'
 
-
 WIN_REGISTRY_PATH=r'Software\Mozilla\NativeMessagingHosts\pywalfox'
 MANIFEST_TARGET_PATH_WIN=os.path.join(HOME_PATH, '.pywalfox')
 
@@ -55,6 +54,9 @@ def normalize_path(target_path):
     """
     return (r'%s' % target_path).replace('\\', '/')
 
+def get_full_manifest_path(target_path):
+    return os.path.join(target_path, MANIFEST_TARGET_NAME)
+
 def set_daemon_path(manifest_path, bin_path):
     """
     Replaces the '<path>' placeholder in the default manifest file with the path to the executable.
@@ -73,7 +75,7 @@ def copy_manifest(target_path, bin_path):
     :param target_path str: the path to the hosts directory
     :param bin_path str: the path to the daemon executable
     """
-    full_path = os.path.join(target_path, MANIFEST_TARGET_NAME)
+    full_path = get_full_manifest_path(target_path)
     create_hosts_directory(target_path)
     remove_existing_manifest(full_path)
 
@@ -117,9 +119,10 @@ def get_target_path_key(user_only):
     else:
         return 'FIREFOX'
 
-def win_setup(manifest_path_key):
+def setup_register(manifest_path_key):
     """
-    Windows specific installation.
+    Imports the winreg module and returns the hkey based on if the
+    manifest should be installed for the current user only, or for all users.
 
     :param manifest_path_key str: the key in MANIFEST_TARGET_PATHS_WIN that corresponds to the target path
     """
@@ -131,6 +134,34 @@ def win_setup(manifest_path_key):
     hkey = winreg.HKEY_CURRENT_USER
     if manifest_path_key == 'FIREFOX':
         hkey = winreg.HKEY_LOCAL_MACHINE
+
+    return hkey
+
+def delete_registry_keys(manifest_path_key):
+    """
+    Tries to delete an existing registry key holding the path tot the manifest.
+
+    :param manifest_path_key str: the key in MANIFEST_TARGET_PATHS_WIN that corresponds to the target path
+    """
+    hkey = setup_register(manifest_path_key)
+
+    try:
+        reg_key = winreg.OpenKey(hkey, WIN_REGISTRY_PATH, 0, winreg.KEY_SET_VALUE)
+        print('Found existing registry key and opened with write permissions')
+        sub_key = winreg.EnumKey(reg_key, 0)
+        winreg.DeleteKey(reg_key, sub_key)
+        print('Deleted registry key: %s' % WIN_REGISTRY_PATH)
+    except:
+        print('No existing registry key found')
+        return
+
+def win_setup(manifest_path_key):
+    """
+    Windows specific installation.
+
+    :param manifest_path_key str: the key in MANIFEST_TARGET_PATHS_WIN that corresponds to the target path
+    """
+    hkey = setup_register(manifest_path_key)
 
     try:
         reg_key = winreg.OpenKey(hkey, WIN_REGISTRY_PATH, 0, winreg.KEY_SET_VALUE)
@@ -173,7 +204,7 @@ def start_setup(user_only):
     """
     Installs the native messaging host manifest.
 
-    :param user_only str: if the manifest should be installed for the current user only
+    :param user_only bool: if the manifest should be installed for the current user only
     """
     manifest_path_key = get_target_path_key(user_only)
 
@@ -183,4 +214,25 @@ def start_setup(user_only):
         darwin_setup(manifest_path_key)
     else:
         unix_setup(manifest_path_key)
+
+def start_uninstall(user_only):
+    """
+    Tries to remove an existing manifest and delete registry keys (win32).
+
+    :param user_only bool: if the manifest should be installed for the current user only
+    """
+    manifest_path_key = get_target_path_key(user_only)
+    full_manifest_path = get_full_manifest_path(manifest_path)
+
+    if sys.platform.startswith('win32'):
+        manifest_path = MANIFEST_TARGET_PATH_WIN[manifest_path_key]
+        delete_registry_keys(manifest_path_key)
+    elif sys.platform.startswith('darwin'):
+        manifest_path = MANIFEST_TARGET_PATHS_DARWIN[manifest_path_key]
+    else:
+        manifest_path = MANIFEST_TARGET_PATH_UNIX[manifest_path_key]
+
+    remove_existing_manifest(full_manifest_path)
+
+
 
