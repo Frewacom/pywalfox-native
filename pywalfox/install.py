@@ -148,11 +148,16 @@ def delete_registry_keys(manifest_path_key):
     try:
         reg_key = winreg.OpenKey(hkey, WIN_REGISTRY_PATH, 0, winreg.KEY_SET_VALUE)
         print('Found existing registry key and opened with write permissions')
+    except:
+        print('No existing registry key found')
+        return
+
+    try:
         sub_key = winreg.EnumKey(reg_key, 0)
         winreg.DeleteKey(reg_key, sub_key)
         print('Deleted registry key: %s' % WIN_REGISTRY_PATH)
-    except:
-        print('No existing registry key found')
+    except Exception as e:
+        print('Failed to remove existing registry key: %s' % str(e))
         return
 
 def win_setup(manifest_path_key):
