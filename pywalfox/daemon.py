@@ -131,10 +131,11 @@ class Daemon:
         if target is not False:
             if self.check_chrome_path(action):
                 if 'size' in message:
-                    (success, message) = set_font_size(self.chrome_path, target, message['size'])
+                    new_size = message['size']
+                    (success, message) = set_font_size(self.chrome_path, target, new_size)
                     self.messenger.send_message(Message(
                         action,
-                        data=target,
+                        data=new_size,
                         success=success,
                         message=message
                     ))
