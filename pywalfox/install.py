@@ -5,6 +5,12 @@ import fileinput
 
 from .config import APP_PATH, HOME_PATH, BIN_PATH_UNIX, BIN_PATH_WIN
 
+if sys.platform.startswith('win32'):
+    try:
+        import _winreg as winreg
+    except ImportError:
+        import winreg
+
 # We only need these variables when running the setup, so might as well define them here.
 MANIFEST_SRC_PATH=os.path.join(APP_PATH, 'assets/manifest.json')
 MANIFEST_TARGET_NAME='pywalfox.json'
@@ -130,11 +136,6 @@ def setup_register(manifest_path_key):
 
     :param manifest_path_key str: the key in MANIFEST_TARGET_PATHS_WIN that corresponds to the target path
     """
-    try:
-        import _winreg as winreg
-    except ImportError:
-        import winreg
-
     hkey = winreg.HKEY_CURRENT_USER
     if manifest_path_key == 'FIREFOX':
         hkey = winreg.HKEY_LOCAL_MACHINE
@@ -147,6 +148,7 @@ def delete_registry_keys(manifest_path_key):
 
     :param manifest_path_key str: the key in MANIFEST_TARGET_PATHS_WIN that corresponds to the target path
     """
+
     hkey = setup_register(manifest_path_key)
 
     try:
@@ -157,8 +159,8 @@ def delete_registry_keys(manifest_path_key):
         return
 
     try:
-        sub_key = winreg.EnumKey(reg_key, 0)
-        winreg.DeleteKey(reg_key, sub_key)
+        winreg.DeleteValue(reg_key, '')
+        winreg.DeleteKey(hkey, WIN_REGISTRY_PATH)
         print('Deleted registry key: %s' % WIN_REGISTRY_PATH)
     except Exception as e:
         print('Failed to remove existing registry key: %s' % str(e))
@@ -242,6 +244,3 @@ def start_uninstall(user_only):
 
     full_manifest_path = get_full_manifest_path(manifest_path)
     remove_existing_manifest(full_manifest_path)
-
-
-
