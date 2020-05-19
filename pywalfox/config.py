@@ -21,8 +21,6 @@ LOG_FILE_MAX_SIZE=1000*200 # 0.2 mb
 LOG_FILE_FORMAT='[%(asctime)s] %(levelname)s:%(message)s'
 LOG_FILE_DATE_FORMAT='%m-%d-%Y %I:%M:%S'
 
-BG_LIGHT_MODIFIER=35
-
 ACTIONS={
     'VERSION': 'debug:version',
     'OUTPUT': 'debug:output',

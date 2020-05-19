@@ -1,8 +1,7 @@
 import os
 import logging
 
-from .config import PYWAL_COLORS_PATH, BG_LIGHT_MODIFIER
-from .utils.colors import generate_brighter_shade
+from .config import PYWAL_COLORS_PATH
 
 def get_colorscheme():
     """
@@ -25,10 +24,6 @@ def get_colorscheme():
         error_message = '%s containing the generated pywal colors is invalid' % PYWAL_COLORS_PATH
         logging.error(error_message)
         return (False, error_message)
-
-    # TODO: Move these to the extension and delete the utils/colors.py file
-    colors.append('#ffffff')
-    colors.append(generate_brighter_shade(colors[0], BG_LIGHT_MODIFIER))
 
     logging.debug('Successfully fetched pywal colors and created colorscheme')
     return (True, colors)
