@@ -1,6 +1,6 @@
 import os
 
-DAEMON_VERSION='2.0'
+DAEMON_VERSION='2.1'
 
 UNIX_SOCKET_PATH='/tmp/pywalfox_socket'
 WIN_SOCKET_HOST = ('127.0.0.1', 56744)
