@@ -2,12 +2,21 @@ from __future__ import print_function
 
 import os
 import re
+import sys
 import glob
 import shutil
 import logging
 import fileinput
 
-from .config import CSS_PATH
+from .config import CSS_PATH, FIREFOX_PATH_WIN, FIREFOX_PATH_DARWIN, FIREFOX_PATH_LINUX
+
+def get_glob_path():
+    if sys.platform.startswith('win32'):
+        return FIREFOX_PATH_WIN
+    elif sys.platform.startswith('darwin'):
+        return FIREFOX_PATH_DARWIN
+    else:
+        return FIREFOX_PATH_LINUX
 
 def get_firefox_chrome_path():
     """
@@ -16,7 +25,7 @@ def get_firefox_chrome_path():
     :return: the absolute path to the chrome folder
     :rType: str
     """
-    profile_path = glob.glob('%s/*.default-release' % os.path.expanduser('~/.mozilla/firefox'))
+    profile_path = glob.glob(get_glob_path())
 
     if len(profile_path) < 1:
         logging.error('Could not find default Firefox profile')

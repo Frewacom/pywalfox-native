@@ -1,6 +1,6 @@
 import os
 
-DAEMON_VERSION='2.1'
+DAEMON_VERSION='2.2'
 
 UNIX_SOCKET_PATH='/tmp/pywalfox_socket'
 WIN_SOCKET_HOST = ('127.0.0.1', 56744)
@@ -11,9 +11,13 @@ HOME_PATH=os.getenv('XDG_CONFIG_HOME', os.path.expanduser('~'))
 PYWAL_COLORS_PATH=os.path.join(HOME_PATH, '.cache/wal/colors')
 
 APP_PATH=os.path.dirname(os.path.abspath(__file__))
-BIN_PATH_WIN=os.path.join(APP_PATH, 'bin/win.bat')
 BIN_PATH_UNIX=os.path.join(APP_PATH, 'bin/main.sh')
+BIN_PATH_WIN=os.path.join(APP_PATH, 'bin/win.bat')
 CSS_PATH=os.path.join(APP_PATH, 'assets/css')
+
+FIREFOX_PATH_LINUX=os.path.join(HOME_PATH, '.mozilla/firefox/*.default-release')
+FIREFOX_PATH_DARWIN=os.path.join(HOME_PATH, 'Library/Application\ Support/Firefox/Profiles/*.default-*')
+FIREFOX_PATH_WIN=os.path.join(HOME_PATH, 'AppData/Roaming/Mozilla/Firefox/Profiles/*.default-*')
 
 LOG_FILE_PATH=os.path.join(APP_PATH, 'daemon.log')
 LOG_FILE_COUNT=1
