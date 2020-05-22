@@ -59,9 +59,8 @@ class Messenger:
         :rType: str
         """
         encoded_length = self.stdin.read(4)
-        if len(encoded_length) == 0:
-            logging.error('Failed to read data from stdin')
-            sys.exit(1)
+        if not encoded_length:
+            sys.exit(0)
 
         return self.decode_message(encoded_length)
 

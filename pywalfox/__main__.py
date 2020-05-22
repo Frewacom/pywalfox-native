@@ -48,7 +48,7 @@ def open_log_file():
         else:
             editor = 'nano' # fallback
 
-        subprocess.run([editor, LOG_FILE_PATH])
+        subprocess.call([editor, LOG_FILE_PATH])
     else:
         print('No log file exists')
 
