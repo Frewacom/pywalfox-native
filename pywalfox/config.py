@@ -12,7 +12,7 @@ PYWAL_COLORS_PATH=os.path.join(HOME_PATH, '.cache/wal/colors')
 
 APP_PATH=os.path.dirname(os.path.abspath(__file__))
 BIN_PATH_WIN=os.path.join(APP_PATH, 'bin/win.bat')
-BIN_PATH_UNIX=os.path.join(APP_PATH, 'bin/unix.sh')
+BIN_PATH_UNIX=os.path.join(APP_PATH, 'bin/main.sh')
 CSS_PATH=os.path.join(APP_PATH, 'assets/css')
 
 LOG_FILE_PATH=os.path.join(APP_PATH, 'daemon.log')
