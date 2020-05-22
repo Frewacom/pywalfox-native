@@ -3,7 +3,7 @@ import logging
 
 from .config import PYWAL_COLORS_PATH
 
-def get_colorscheme():
+def get_pywal_colors():
     """
     Fetches the pywal colors from the cache file.
 
@@ -18,12 +18,12 @@ def get_colorscheme():
     except IOError:
         error_message = 'Could not read colors from: %s' % PYWAL_COLORS_PATH
         logging.error(error_message)
-        return (False, error_message)
+        return (False, None, error_message)
 
     if len(colors) < 16:
         error_message = '%s containing the generated pywal colors is invalid' % PYWAL_COLORS_PATH
         logging.error(error_message)
-        return (False, error_message)
+        return (False, None, error_message)
 
-    logging.debug('Successfully fetched pywal colors and created colorscheme')
-    return (True, colors)
+    logging.debug('Successfully fetched pywal colors')
+    return (True, colors, None)

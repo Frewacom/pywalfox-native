@@ -31,22 +31,25 @@ class Daemon:
         """Tries to set the path to the chrome directory."""
         self.chrome_path = get_firefox_chrome_path()
 
-    def check_chrome_path(self, action):
+    def check_chrome_path(self, action, target):
         """
         Checks if the path to the 'chrome' directory was found and sends a message if it was not.
 
+        :param action str: the message action
+        :param target str: the target CSS file
         :return: if chrome_path is set
         :rType: bool
         """
         if not self.chrome_path:
             self.messenger.send_message(Message(
                 action,
-                'Could not find path to chrome folder',
-                success=False
+                data=target,
+                success=False,
+                message='Could not find path to chrome folder',
             ))
             return False
-        else:
-            return True
+        
+        return True
 
     def check_target(self, message):
         """
@@ -67,10 +70,15 @@ class Daemon:
         """Sends the current daemon version to the extension."""
         self.messenger.send_message(Message(ACTIONS['VERSION'], data=DAEMON_VERSION))
 
-    def send_colorscheme(self):
+    def send_pywal_colors(self):
         """Sends the current colorscheme to the extension."""
-        (success, colorscheme) = get_colorscheme()
-        self.messenger.send_message(Message(ACTIONS['COLORS'], data=colorscheme, success=success))
+        (success, colors, message) = get_pywal_colors()
+        self.messenger.send_message(Message(
+            ACTIONS['COLORS'], 
+            data=colors, 
+            success=success,
+            message=message,
+        ))
 
     def send_invalid_action(self):
         """Sends an action to the extension indicating that the action sent was invalid"""
@@ -93,13 +101,13 @@ class Daemon:
         action = ACTIONS['CSS_ENABLE']
         target = self.check_target(message)
         if target is not False:
-            if self.check_chrome_path(action):
+            if self.check_chrome_path(action, target):
                 (success, message) = enable_custom_css(self.chrome_path, target)
                 self.messenger.send_message(Message(
                     action,
                     data=target,
                     success=success,
-                    message=message
+                    message=message,
                 ))
 
     def send_disable_css_response(self, message):
@@ -111,13 +119,13 @@ class Daemon:
         action = ACTIONS['CSS_DISABLE']
         target = self.check_target(message)
         if target is not False:
-            if self.check_chrome_path(action):
+            if self.check_chrome_path(action, target):
                 (success, message) = disable_custom_css(self.chrome_path, target)
                 self.messenger.send_message(Message(
                     action,
                     data=target,
                     success=success,
-                    message=message
+                    message=message,
                 ))
 
     def send_font_size_response(self, message):
@@ -129,7 +137,7 @@ class Daemon:
         action = ACTIONS['CSS_FONT_SIZE']
         target = self.check_target(message)
         if target is not False:
-            if self.check_chrome_path(action):
+            if self.check_chrome_path(action, target):
                 if 'size' in message:
                     new_size = message['size']
                     (success, message) = set_font_size(self.chrome_path, target, new_size)
@@ -137,7 +145,7 @@ class Daemon:
                         action,
                         data=new_size,
                         success=success,
-                        message=message
+                        message=message,
                     ))
 
     def handle_message(self, message):
@@ -151,7 +159,7 @@ class Daemon:
             if action == ACTIONS['VERSION']:
                 self.send_version()
             elif action == ACTIONS['COLORS']:
-                self.send_colorscheme()
+                self.send_pywal_colors()
             elif action == ACTIONS['CSS_ENABLE']:
                 self.send_enable_css_response(message)
             elif action == ACTIONS['CSS_DISABLE']:
@@ -171,15 +179,13 @@ class Daemon:
             message = self.socket_server.get_message()
             if message == 'update':
                 logging.debug('Update triggered from external script')
-                self.send_colorscheme()
+                self.send_pywal_colors()
 
     def start_socket_server(self):
         """Starts the socket server and creates the socket thread."""
         success = self.socket_server.start()
         if success == True:
             if self.python_version == 3:
-                # We use daemon=True so that the thread will exit when the daemon exits.
-                # https://docs.python.org/2/library/threading.html#threading.Thread.daemon
                 self.socket_thread = Thread(target=self.socket_thread_worker, daemon=True)
             else:
                 self.socket_thread = Thread(target=self.socket_thread_worker)

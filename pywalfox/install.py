@@ -184,7 +184,7 @@ def win_setup(manifest_path_key):
     try:
         normalized_target_path = normalize_path(os.path.join(MANIFEST_TARGET_PATH_WIN, MANIFEST_TARGET_NAME))
         winreg.SetValue(reg_key, '', winreg.REG_SZ, normalized_target_path)
-        print('Set value of registry: %s to %s' % (reg_key, normalized_target_path))
+        print('Set value of registry: %s to %s' % (WIN_REGISTRY_PATH, normalized_target_path))
     except Exception as e:
         print('Failed to set registry key: %s' % reg_key)
         sys.exit(1)
