@@ -16,7 +16,6 @@ from .utils.logger import *
 
 parser = argparse.ArgumentParser(description='Pywalfox - Native messaging host')
 parser.add_argument('action', nargs='?', default=None, help='available options are setup, update, daemon, log and uninstall')
-parser.add_argument('-g', '--global', dest='user_only', action='store_false', help='install for the current user only')
 parser.add_argument('--verbose', dest='verbose', action='store_true', help='runs the daemon in verbose mode with debugging output')
 parser.add_argument('-p', '--print', dest='print_mode', action='store_true', help='prints the debugging output instead of writing to logfile')
 parser.add_argument('-v', '--version', dest='version', action='store_true', help='displays the current version of the daemon')
@@ -86,12 +85,12 @@ def handle_args(args):
 
     if args.action == 'setup':
         from pywalfox.install import start_setup
-        start_setup(args.user_only)
+        start_setup(True)
         sys.exit(0)
 
     if args.action == 'uninstall':
         from pywalfox.install import start_uninstall
-        start_uninstall(args.user_only)
+        start_uninstall(True)
         sys.exit(0)
 
     # If no action was specified

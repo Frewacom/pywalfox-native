@@ -16,13 +16,13 @@ setuptools.setup(
     long_description_content_type="text/markdown",
     long_description=LONG_DESC,
     keywords="dynamic browser-theme firefox chrome duckduckgo unixporn native-messaging-host pywal colorscheme",
-    license="MIT",
-    url="https://github.com/Frewacom/pywalfox",
+    license="MPL-2.0",
+    url="https://github.com/frewacom/pywalfox",
     download_url=DOWNLOAD,
     classifiers=[
         "Operating System :: POSIX :: Linux",
         "Operating System :: Microsoft :: Windows",
-        "License :: OSI Approved :: MIT License",
+        "License :: OSI Approved :: Mozilla Public License 2.0 (MPL 2.0)",
         "Programming Language :: Python :: 2.7",
         "Programming Language :: Python :: 3",
         "Topic :: Utilities"
