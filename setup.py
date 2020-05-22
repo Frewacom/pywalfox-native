@@ -20,12 +20,13 @@ setuptools.setup(
     url="https://github.com/frewacom/pywalfox",
     download_url=DOWNLOAD,
     classifiers=[
+        "Topic :: Utilities",
         "Operating System :: POSIX :: Linux",
+        "Operating System :: MacOS :: MacOS X",
         "Operating System :: Microsoft :: Windows",
-        "License :: OSI Approved :: Mozilla Public License 2.0 (MPL 2.0)",
         "Programming Language :: Python :: 2.7",
         "Programming Language :: Python :: 3",
-        "Topic :: Utilities"
+        "License :: OSI Approved :: Mozilla Public License 2.0 (MPL 2.0)",
     ],
     packages=["pywalfox"],
     entry_points={"console_scripts": ["pywalfox=pywalfox.__main__:main"]},
