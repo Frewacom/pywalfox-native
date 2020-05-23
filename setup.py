@@ -5,7 +5,7 @@ import pywalfox.config
 
 LONG_DESC=open('README.md').read()
 VERSION=pywalfox.config.DAEMON_VERSION
-DOWNLOAD = "https://github.com/Frewacom/pywalfox-native/archive/%s.tar.gz" % VERSION
+DOWNLOAD = "https://github.com/Frewacom/pywalfox-native/archive/v%s.tar.gz" % VERSION
 
 setuptools.setup(
     name="pywalfox",
