@@ -16,7 +16,7 @@ BIN_PATH_WIN=os.path.join(APP_PATH, 'bin/win.bat')
 CSS_PATH=os.path.join(APP_PATH, 'assets/css')
 
 FIREFOX_PATH_LINUX=os.path.join(HOME_PATH, '.mozilla/firefox/*.default-release')
-FIREFOX_PATH_DARWIN=os.path.join(HOME_PATH, 'Library/Application\ Support/Firefox/Profiles/*.default-*')
+FIREFOX_PATH_DARWIN=os.path.join(HOME_PATH, 'Library/Application\ Support/Firefox/Profiles/*.default-release*')
 FIREFOX_PATH_WIN=os.path.join(HOME_PATH, 'AppData/Roaming/Mozilla/Firefox/Profiles/*.default-*')
 
 LOG_FILE_PATH=os.path.join(APP_PATH, 'daemon.log')
