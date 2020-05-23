@@ -7,9 +7,6 @@ WIN_SOCKET_HOST = ('127.0.0.1', 56744)
 
 SUPPORTED_BROWSERS=['firefox']
 
-HOME_PATH=os.getenv('XDG_CONFIG_HOME', os.path.expanduser('~'))
-PYWAL_COLORS_PATH=os.path.join(HOME_PATH, '.cache/wal/colors')
-
 HOME_PATH=os.path.expanduser('~')
 XDG_CACHE_DIR = os.getenv('XDG_CACHE_HOME', os.path.join(HOME_PATH, '.cache'))
 PYWAL_COLORS_PATH=os.path.join(XDG_CACHE_DIR, 'wal/colors')
