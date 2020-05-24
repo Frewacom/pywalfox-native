@@ -48,7 +48,7 @@ class Daemon:
                 message='Could not find path to chrome folder',
             ))
             return False
-        
+
         return True
 
     def check_target(self, message):
@@ -74,8 +74,8 @@ class Daemon:
         """Sends the current colorscheme to the extension."""
         (success, colors, message) = get_pywal_colors()
         self.messenger.send_message(Message(
-            ACTIONS['COLORS'], 
-            data=colors, 
+            ACTIONS['COLORS'],
+            data=colors,
             success=success,
             message=message,
         ))
@@ -189,6 +189,7 @@ class Daemon:
                 self.socket_thread = Thread(target=self.socket_thread_worker, daemon=True)
             else:
                 self.socket_thread = Thread(target=self.socket_thread_worker)
+                self.socket_thread.daemon = True
 
             self.socket_thread.start()
 
