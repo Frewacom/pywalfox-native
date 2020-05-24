@@ -22,6 +22,12 @@ def get_firefox_profiles_path():
     else:
         return FIREFOX_PROFILES_PATH_LINUX
 
+def get_profile_section(profile):
+    """Finds the section that stores the name of the default profile."""
+    for section in profile.sections():
+        if 'Install' in section:
+            return section
+
 def get_profile_from_ini():
     """
     Reads the profile name for Profile0 in profiles.ini and returns the absolute path to the profile.
@@ -38,7 +44,8 @@ def get_profile_from_ini():
     profile = configparser.ConfigParser()
     profile.read(ini_path)
 
-    profile_path = os.path.normpath(os.path.join(firefox_profiles_path, profile.get('Profile0', 'Path')))
+    profile_section = get_profile_section(profile)
+    profile_path = os.path.normpath(os.path.join(firefox_profiles_path, profile.get(profile_section, 'Default')))
     if not os.path.exists(profile_path):
         logging.error('The profile path retrieved from profiles.ini does not exist: %s' % profile_path)
         return False

@@ -17,8 +17,10 @@ BIN_PATH_WIN=os.path.join(APP_PATH, 'bin/win.bat')
 CSS_PATH=os.path.join(APP_PATH, 'assets/css')
 
 FIREFOX_PROFILES_PATH_LINUX=os.path.join(HOME_PATH, '.mozilla/firefox')
-FIREFOX_PROFILES_PATH_DARWIN=os.path.join(HOME_PATH, 'Library/Application\ Support/Firefox/Profiles')
 FIREFOX_PROFILES_PATH_WIN=os.path.join(HOME_PATH, 'AppData/Roaming/Mozilla/Firefox/Profiles')
+
+# For some reason, on MacOS, the profiles.ini file stores Profiles/ as a prefix to all profiles
+FIREFOX_PROFILES_PATH_DARWIN=os.path.join(HOME_PATH, 'Library/Application Support/Firefox')
 
 LOG_FILE_PATH=os.path.join(APP_PATH, 'daemon.log')
 LOG_FILE_COUNT=1
