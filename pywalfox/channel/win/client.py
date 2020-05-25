@@ -1,8 +1,6 @@
-import os
-import socket
 import logging
-
 from ..connector import Connector
+
 
 class Client(Connector):
     """UDP-socket client used to communicate with the daemon."""

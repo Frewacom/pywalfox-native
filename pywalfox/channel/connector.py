@@ -1,9 +1,7 @@
-import os
-import sys
 import socket
 import logging
-
 from ..config import UNIX_SOCKET_PATH, WIN_SOCKET_HOST
+
 
 class Connector:
     """
@@ -67,8 +65,5 @@ class Connector:
         self.socket.send(encoded_message)
 
     def close(self):
-         """Closes the socket connection."""
-         self.socket.close()
-
-
-
+        """Closes the socket connection."""
+        self.socket.close()

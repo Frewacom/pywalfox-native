@@ -1,8 +1,7 @@
 import os
-import socket
 import logging
-
 from ..connector import Connector
+
 
 class Client(Connector):
     """UNIX-socket client used to communicate with the daemon."""
@@ -27,5 +26,3 @@ class Client(Connector):
             logging.error('Could not find socket: %s' % self.host)
 
         return False
-
-

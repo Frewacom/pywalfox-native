@@ -12,18 +12,18 @@ if sys.platform.startswith('win32'):
         import winreg
 
 # We only need these variables when running the setup, so might as well define them here.
-MANIFEST_SRC_PATH=os.path.join(APP_PATH, 'assets/manifest.json')
-MANIFEST_TARGET_NAME='pywalfox.json'
+MANIFEST_SRC_PATH = os.path.join(APP_PATH, 'assets/manifest.json')
+MANIFEST_TARGET_NAME = 'pywalfox.json'
 
-WIN_REGISTRY_PATH=r'Software\Mozilla\NativeMessagingHosts\pywalfox'
-MANIFEST_TARGET_PATH_WIN=os.path.join(HOME_PATH, '.pywalfox')
+WIN_REGISTRY_PATH = r'Software\Mozilla\NativeMessagingHosts\pywalfox'
+MANIFEST_TARGET_PATH_WIN = os.path.join(HOME_PATH, '.pywalfox')
 
-MANIFEST_TARGET_PATHS_UNIX={
+MANIFEST_TARGET_PATHS_UNIX = {
     'FIREFOX': os.path.join('/usr/lib/mozilla/native-messaging-hosts'),
     'FIREFOX_USER': os.path.join(HOME_PATH, '.mozilla/native-messaging-hosts'),
 }
 
-MANIFEST_TARGET_PATHS_DARWIN={
+MANIFEST_TARGET_PATHS_DARWIN = {
     'FIREFOX': os.path.join('/Library/Application Support/Mozilla/NativeMessagingHosts'),
     'FIREFOX_USER': os.path.join(HOME_PATH, 'Library/Application Support/Mozilla/NativeMessagingHosts/'),
 }
@@ -124,7 +124,7 @@ def get_target_path_key(user_only):
     :return: the key in MANIFEST_TARGET_PATHS_* corresponding to the manifest path
     :rType: str
     """
-    if user_only == True:
+    if user_only is True:
         return 'FIREFOX_USER'
     else:
         return 'FIREFOX'
@@ -154,7 +154,7 @@ def delete_registry_keys(manifest_path_key):
     try:
         reg_key = winreg.OpenKey(hkey, WIN_REGISTRY_PATH, 0, winreg.KEY_SET_VALUE)
         print('Found existing registry key and opened with write permissions')
-    except:
+    except Exception:
         print('No existing registry key found')
         return
 
@@ -177,7 +177,7 @@ def win_setup(manifest_path_key):
     try:
         reg_key = winreg.OpenKey(hkey, WIN_REGISTRY_PATH, 0, winreg.KEY_SET_VALUE)
         print('Opened registry key with write permissions')
-    except:
+    except Exception:
         reg_key = winreg.CreateKey(hkey, WIN_REGISTRY_PATH)
         print('Created new registry key')
 
@@ -186,7 +186,7 @@ def win_setup(manifest_path_key):
         winreg.SetValue(reg_key, '', winreg.REG_SZ, normalized_target_path)
         print('Set value of registry: %s to %s' % (WIN_REGISTRY_PATH, normalized_target_path))
     except Exception as e:
-        print('Failed to set registry key: %s' % reg_key)
+        print('Failed to set registry key: %s\n%s' % (reg_key, str(e)))
         sys.exit(1)
 
     copy_manifest(MANIFEST_TARGET_PATH_WIN, BIN_PATH_WIN)
@@ -230,7 +230,7 @@ def start_uninstall(user_only):
     """
     Tries to remove an existing manifest and delete registry keys (win32).
 
-    :param user_only bool: if the manifest should be installed for the current user only
+    :param user_only bool: if the manifest should be uninstalled for the current user only
     """
     manifest_path_key = get_target_path_key(user_only)
 

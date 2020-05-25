@@ -1,8 +1,6 @@
-import os
-import socket
 import logging
-
 from ..connector import Connector
+
 
 class Server(Connector):
     """UDP-socket server used to communicate with clients."""
@@ -22,6 +20,5 @@ class Server(Connector):
             return True
         except OSError as e:
             logging.error('Failed to setup UDP socket server: %s' % e.strerror)
-        
-        return False
 
+        return False

@@ -1,7 +1,7 @@
 import logging
 from logging.handlers import RotatingFileHandler
+from ..config import LOG_FILE_FORMAT, LOG_FILE_DATE_FORMAT, LOG_FILE_PATH, LOG_FILE_MAX_SIZE, LOG_FILE_COUNT
 
-from ..config import *
 
 def create_rotating_log(name, log_level):
     """
@@ -24,8 +24,8 @@ def setup_logging(verbose, print_mode):
     :param verbose bool: if debug messages should be saved/printed
     :param print_mode bool: whether or not to print to the terminal
     """
-    if verbose == True:
-        if print_mode == True:
+    if verbose is True:
+        if print_mode is True:
             logging.basicConfig(
                 format=LOG_FILE_FORMAT,
                 datefmt=LOG_FILE_DATE_FORMAT,
@@ -41,4 +41,3 @@ def setup_logging(verbose, print_mode):
             )
     else:
         create_rotating_log('', logging.ERROR) # use the root logger
-

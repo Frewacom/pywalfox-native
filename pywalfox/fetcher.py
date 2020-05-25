@@ -1,7 +1,6 @@
-import os
 import logging
-
 from .config import PYWAL_COLORS_PATH
+
 
 def get_pywal_colors():
     """

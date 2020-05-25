@@ -4,15 +4,14 @@ import logging
 import argparse
 import subprocess
 
-from .config import DAEMON_VERSION, LOG_FILE_PATH, SUPPORTED_BROWSERS
 from .daemon import Daemon
+from .utils.logger import setup_logging
+from .config import DAEMON_VERSION, LOG_FILE_PATH
 
 if sys.platform.startswith('win32'):
     from .channel.win.client import Client
 else:
     from .channel.unix.client import Client
-
-from .utils.logger import *
 
 parser = argparse.ArgumentParser(description='Pywalfox - Native messaging host')
 parser.add_argument('action', nargs='?', default=None, help='available options are setup, update, daemon, log and uninstall')
@@ -24,7 +23,7 @@ def get_python_version():
     """Gets the current python version and checks if it is supported."""
     python_version = sys.version_info
     version_label = '%s.%s.%s' % (python_version[0], python_version[1], python_version[2])
-    if python_version < (2,7):
+    if python_version < (2, 7):
         logging.error('Python version %s is not supported' % version_label)
         sys.exit(1)
     else:
@@ -37,7 +36,7 @@ def send_update_action():
     client = Client()
     connected = client.start()
 
-    if connected == True:
+    if connected is True:
         client.send_message('update')
 
 def open_log_file():
@@ -103,5 +102,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
-

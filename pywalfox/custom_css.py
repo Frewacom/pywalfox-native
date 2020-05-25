@@ -1,7 +1,6 @@
 from __future__ import print_function
 
 import os
-import re
 import sys
 import glob
 import shutil
@@ -9,6 +8,7 @@ import logging
 import fileinput
 
 from .config import CSS_PATH, FIREFOX_PATH_WIN, FIREFOX_PATH_DARWIN, FIREFOX_PATH_LINUX
+
 
 def get_glob_path():
     if sys.platform.startswith('win32'):

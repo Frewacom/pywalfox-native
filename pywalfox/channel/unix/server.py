@@ -1,8 +1,7 @@
 import os
-import socket
 import logging
-
 from ..connector import Connector
+
 
 class Server(Connector):
     """UNIX-socket server used to communicate with clients."""
@@ -28,11 +27,10 @@ class Server(Connector):
             return True
         except OSError as e:
             logging.error('Failed to create UNIX socket: %s' % e.strerror)
-        
+
         return False
 
     def close(self):
         """Unbinds the socket and deletes the file."""
         self.socket.close()
         os.remove(self.host)
-

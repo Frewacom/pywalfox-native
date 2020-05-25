@@ -1,5 +1,6 @@
 import logging
 
+
 class Message:
     """
     Defines the structure of a generic message.

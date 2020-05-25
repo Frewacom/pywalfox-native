@@ -2,10 +2,10 @@ import sys
 import logging
 from threading import Thread
 
-from .fetcher import *
-from .custom_css import *
+from .fetcher import get_pywal_colors
+from .custom_css import get_firefox_chrome_path, enable_custom_css, set_font_size, disable_custom_css
 
-from .config import *
+from .config import DAEMON_VERSION, ACTIONS
 from .response import Message
 from .messenger import Messenger
 
@@ -13,6 +13,7 @@ if sys.platform.startswith('win32'):
     from .channel.win.server import Server
 else:
     from .channel.unix.server import Server
+
 
 class Daemon:
     """
@@ -48,7 +49,7 @@ class Daemon:
                 message='Could not find path to chrome folder',
             ))
             return False
-        
+
         return True
 
     def check_target(self, message):
@@ -74,8 +75,8 @@ class Daemon:
         """Sends the current colorscheme to the extension."""
         (success, colors, message) = get_pywal_colors()
         self.messenger.send_message(Message(
-            ACTIONS['COLORS'], 
-            data=colors, 
+            ACTIONS['COLORS'],
+            data=colors,
             success=success,
             message=message,
         ))
@@ -184,7 +185,7 @@ class Daemon:
     def start_socket_server(self):
         """Starts the socket server and creates the socket thread."""
         success = self.socket_server.start()
-        if success == True:
+        if success is True:
             if self.python_version == 3:
                 self.socket_thread = Thread(target=self.socket_thread_worker, daemon=True)
             else:
@@ -209,13 +210,3 @@ class Daemon:
         self.socket_server.close()
         self.is_running = False
         logging.debug('Cleanup')
-
-
-
-
-
-
-
-
-
-

@@ -1,9 +1,7 @@
 import sys
 import json
 import struct
-import logging
 
-from .config import DAEMON_VERSION, ACTIONS
 
 class Messenger:
     """
@@ -74,13 +72,3 @@ class Messenger:
         self.stdout.write(length)
         self.stdout.write(encoded_message)
         self.stdout.flush()
-
-
-
-
-
-
-
-
-
-
