@@ -190,6 +190,7 @@ class Daemon:
                 self.socket_thread = Thread(target=self.socket_thread_worker, daemon=True)
             else:
                 self.socket_thread = Thread(target=self.socket_thread_worker)
+                self.socket_thread.daemon = True
 
             self.socket_thread.start()
 

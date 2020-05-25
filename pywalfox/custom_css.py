@@ -2,21 +2,56 @@ from __future__ import print_function
 
 import os
 import sys
-import glob
 import shutil
 import logging
 import fileinput
+from .config import CSS_PATH, FIREFOX_PROFILES_PATH_WIN, FIREFOX_PROFILES_PATH_DARWIN, FIREFOX_PROFILES_PATH_LINUX
 
-from .config import CSS_PATH, FIREFOX_PATH_WIN, FIREFOX_PATH_DARWIN, FIREFOX_PATH_LINUX
+try:
+    import configparser
+except ImportError: # python 2.7.x
+    import ConfigParser as configparser
 
 
-def get_glob_path():
+def get_firefox_profiles_path():
+    """Gets the correct Firefox profiles folder based on the current OS."""
     if sys.platform.startswith('win32'):
-        return FIREFOX_PATH_WIN
+        return FIREFOX_PROFILES_PATH_WIN
     elif sys.platform.startswith('darwin'):
-        return FIREFOX_PATH_DARWIN
+        return FIREFOX_PROFILES_PATH_DARWIN
     else:
-        return FIREFOX_PATH_LINUX
+        return FIREFOX_PROFILES_PATH_LINUX
+
+def get_profile_section(profile):
+    """Finds the section that stores the name of the default profile."""
+    for section in profile.sections():
+        if 'Install' in section:
+            return section
+
+def get_profile_from_ini():
+    """
+    Reads the default profile name for the current Firefox installation
+    from profiles.ini and returns the absolute path to the profile.
+
+    :return: path to the current profile folder
+    :rType: str
+    """
+    firefox_profiles_path = get_firefox_profiles_path()
+    ini_path = os.path.join(firefox_profiles_path, 'profiles.ini')
+    if not os.path.exists(ini_path):
+        logging.error('Could not find profiles.ini in Firefox profiles folder')
+        return False
+
+    profile = configparser.ConfigParser()
+    profile.read(ini_path)
+
+    profile_section = get_profile_section(profile)
+    profile_path = os.path.normpath(os.path.join(firefox_profiles_path, profile.get(profile_section, 'Default')))
+    if not os.path.exists(profile_path):
+        logging.error('The profile path retrieved from profiles.ini does not exist: %s' % profile_path)
+        return False
+
+    return profile_path
 
 def get_firefox_chrome_path():
     """
@@ -25,13 +60,13 @@ def get_firefox_chrome_path():
     :return: the absolute path to the chrome folder
     :rType: str
     """
-    profile_path = glob.glob(get_glob_path())
+    profile_path = get_profile_from_ini()
 
-    if len(profile_path) < 1:
-        logging.error('Could not find default Firefox profile')
+    if not profile_path:
+        logging.error('Could not find Firefox profile folder')
         return False
 
-    chrome_path = os.path.join(profile_path[0], 'chrome')
+    chrome_path = os.path.join(profile_path, 'chrome')
     if not os.path.exists(chrome_path):
         logging.debug('Creating non-existant chrome directory')
         os.makedirs(chrome_path)
