@@ -20,7 +20,7 @@ FIREFOX_PROFILES_PATH_LINUX = os.path.join(HOME_PATH, '.mozilla/firefox')
 FIREFOX_PROFILES_PATH_WIN = os.path.join(HOME_PATH, 'AppData/Roaming/Mozilla/Firefox')
 FIREFOX_PROFILES_PATH_DARWIN = os.path.join(HOME_PATH, 'Library/Application Support/Firefox')
 
-LOG_FILE_PATH = os.path.join(APP_PATH, 'daemon.log')
+LOG_FILE_PATH = os.path.join(XDG_CACHE_DIR, 'pywalfox.log')
 LOG_FILE_COUNT = 1
 LOG_FILE_MAX_SIZE = 1000*200 # 0.2 mb
 LOG_FILE_FORMAT = '[%(asctime)s] %(levelname)s:%(message)s'

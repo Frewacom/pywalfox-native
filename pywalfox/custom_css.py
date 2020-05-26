@@ -22,12 +22,6 @@ def get_firefox_profiles_path():
     else:
         return FIREFOX_PROFILES_PATH_LINUX
 
-def get_profile_section(profile):
-    """Finds the section that stores the name of the default profile."""
-    for section in profile.sections():
-        if 'Install' in section:
-            return section
-
 def get_profile_from_ini():
     """
     Reads the default profile name for the current Firefox installation
@@ -45,8 +39,17 @@ def get_profile_from_ini():
     profile = configparser.ConfigParser()
     profile.read(ini_path)
 
-    profile_section = get_profile_section(profile)
-    profile_path = os.path.normpath(os.path.join(firefox_profiles_path, profile.get(profile_section, 'Default')))
+    section_name = 'Profile0'
+    path_value = profile.get(section_name, 'Path')
+    relative_value = profile.get(section_name, 'IsRelative')
+
+    if relative_value == '1':
+        profile_path = os.path.normpath(os.path.join(firefox_profiles_path, path_value))
+        logging.debug('Firefox profile path is relative')
+    else:
+        profile_path = os.path.normpath(path_value)
+        logging.debug('Firefox profile path is absolute')
+
     if not os.path.exists(profile_path):
         logging.error('The profile path retrieved from profiles.ini does not exist: %s' % profile_path)
         return False
@@ -63,7 +66,6 @@ def get_firefox_chrome_path():
     profile_path = get_profile_from_ini()
 
     if not profile_path:
-        logging.error('Could not find Firefox profile folder')
         return False
 
     chrome_path = os.path.join(profile_path, 'chrome')

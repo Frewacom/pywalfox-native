@@ -19,7 +19,7 @@ class Connector:
         else:
             self.host = UNIX_SOCKET_PATH
             self.socket = socket.socket(socket.AF_UNIX, socket.SOCK_DGRAM)
-            logging.debug('Setup socket server using AF_UNIX (linux)')
+            logging.debug('Setup socket server using AF_UNIX (linux/darwin)')
 
     def encode_message(self, message):
         """
