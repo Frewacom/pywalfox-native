@@ -18,14 +18,14 @@ MANIFEST_TARGET_NAME = 'pywalfox.json'
 WIN_REGISTRY_PATH = r'Software\Mozilla\NativeMessagingHosts\pywalfox'
 MANIFEST_TARGET_PATH_WIN = os.path.join(HOME_PATH, '.pywalfox')
 
-MANIFEST_TARGET_PATHS_UNIX = {
+MANIFEST_TARGET_PATHS_LINUX = {
     'FIREFOX': os.path.join('/usr/lib/mozilla/native-messaging-hosts'),
     'FIREFOX_USER': os.path.join(HOME_PATH, '.mozilla/native-messaging-hosts'),
 }
 
 MANIFEST_TARGET_PATHS_DARWIN = {
     'FIREFOX': os.path.join('/Library/Application Support/Mozilla/NativeMessagingHosts'),
-    'FIREFOX_USER': os.path.join(HOME_PATH, 'Library/Application Support/Mozilla/NativeMessagingHosts/'),
+    'FIREFOX_USER': os.path.join(HOME_PATH, 'Library/Application Support/Mozilla/NativeMessagingHosts'),
 }
 
 def create_hosts_directory(hosts_path):
@@ -117,8 +117,8 @@ def set_executable_permissions(bin_path):
 
 def get_target_path_key(user_only):
     """
-    Gets the path to the 'native-messaging-hosts' directory corresponding to
-    the targeted browser in the CLI-argument.
+    Gets the path key for the 'native-messaging-hosts' directory based on
+    if the manifest should be installed locally or globally.
 
     :param user_only bool: if the manifest should be installed for the current user only
     :return: the key in MANIFEST_TARGET_PATHS_* corresponding to the manifest path
@@ -133,8 +133,6 @@ def setup_register(manifest_path_key):
     """
     Imports the winreg module and returns the hkey based on if the
     manifest should be installed for the current user only, or for all users.
-
-    :param manifest_path_key str: the key in MANIFEST_TARGET_PATHS_WIN that corresponds to the target path
     """
     hkey = winreg.HKEY_CURRENT_USER
     if manifest_path_key == 'FIREFOX':
@@ -143,12 +141,7 @@ def setup_register(manifest_path_key):
     return hkey
 
 def delete_registry_keys(manifest_path_key):
-    """
-    Tries to delete an existing registry key holding the path tot the manifest.
-
-    :param manifest_path_key str: the key in MANIFEST_TARGET_PATHS_WIN that corresponds to the target path
-    """
-
+    """Tries to delete an existing registry key holding the path to the manifest."""
     hkey = setup_register(manifest_path_key)
 
     try:
@@ -167,11 +160,7 @@ def delete_registry_keys(manifest_path_key):
         return
 
 def win_setup(manifest_path_key):
-    """
-    Windows specific installation.
-
-    :param manifest_path_key str: the key in MANIFEST_TARGET_PATHS_WIN that corresponds to the target path
-    """
+    """Windows installation."""
     hkey = setup_register(manifest_path_key)
 
     try:
@@ -191,22 +180,14 @@ def win_setup(manifest_path_key):
 
     copy_manifest(MANIFEST_TARGET_PATH_WIN, BIN_PATH_WIN)
 
-def unix_setup(manifest_path_key):
-    """
-    UNIX specific installation.
-
-    :param manifest_path_key str: the key in MANIFEST_TARGET_PATHS_UNIX that corresponds to the target path
-    """
-    manifest_path = MANIFEST_TARGET_PATHS_UNIX[manifest_path_key]
+def linux_setup(manifest_path_key):
+    """Linux installation."""
+    manifest_path = MANIFEST_TARGET_PATHS_LINUX[manifest_path_key]
     copy_manifest(manifest_path, BIN_PATH_UNIX)
     set_executable_permissions(BIN_PATH_UNIX)
 
 def darwin_setup(manifest_path_key):
-    """
-    Darwin specific installation.
-
-    :param manifest_path_key str: the key in MANIFEST_TARGET_PATHS_UNIX that corresponds to the target path
-    """
+    """MacOS installation."""
     manifest_path = MANIFEST_TARGET_PATHS_DARWIN[manifest_path_key]
     copy_manifest(manifest_path, BIN_PATH_UNIX)
     set_executable_permissions(BIN_PATH_UNIX)
@@ -224,7 +205,7 @@ def start_setup(user_only):
     elif sys.platform.startswith('darwin'):
         darwin_setup(manifest_path_key)
     else:
-        unix_setup(manifest_path_key)
+        linux_setup(manifest_path_key)
 
 def start_uninstall(user_only):
     """
@@ -240,7 +221,7 @@ def start_uninstall(user_only):
     elif sys.platform.startswith('darwin'):
         manifest_path = MANIFEST_TARGET_PATHS_DARWIN[manifest_path_key]
     else:
-        manifest_path = MANIFEST_TARGET_PATHS_UNIX[manifest_path_key]
+        manifest_path = MANIFEST_TARGET_PATHS_LINUX[manifest_path_key]
 
     full_manifest_path = get_full_manifest_path(manifest_path)
     remove_existing_manifest(full_manifest_path)
