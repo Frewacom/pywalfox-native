@@ -17,8 +17,15 @@ menupopup, menuseparator, button, search-textbox {
 }
 
 /* Override the default appearance of buttons and textboxes to match the pywalfox theme */
-button, search-textbox, menuitem[_moz-menuactive="true"], menuseparator {
+button, search-textbox, menuseparator {
   background-color: var(--pywalfox-darker-background) !important;
+}
+
+/* Background color on hover in right-click context menus */
+menu[_moz-menuactive="true"], menuitem[_moz-menuactive="true"] {
+  -moz-appearance: none !important;
+  background-color: rgba(249, 249, 250, 0.1) !important;
+  padding: 5px 5px !important;
 }
 
 /* Separators in dropwdown menus */
