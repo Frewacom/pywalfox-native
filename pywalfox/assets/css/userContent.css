@@ -11,18 +11,13 @@ html {
     --pywalfox-accent: var(--lwt-sidebar-highlight-background-color);
     --pywalfox-background: var(--newtab-background-color);
     --pywalfox-background-light: var(--lwt-sidebar-background-color);
-    --pywalfox-lighter-background: var(--newtab-card-hairline-color);
 
-    --newtab-card-background-color: var(--pywalfox-lighter-background) !important;
-    --newtab-card-active-outline-color: var(--pywalfox-lighter-background) !important;
     --newtab-snippets-background-color: var(--pywalfox-background-light) !important;
-    --newtab-topsites-background-color: transparent !important;
-    --newtab-textbox-background-color: var(--pywalfox-lighter-background) !important;
     --newtab-contextmenu-button-color: var(--pywalfox-background) !important;
     --newtab-contextmenu-background-color: var(--pywalfox-background-light) !important;
-    --trailhead-cards-background-color: var(--pywalfox-lighter-background) !important;
   }
 
+  /* Add bold text to most text */
   .top-site-outer .title span, .top-site-outer .default-icon[data-fallback]::before,
   .top-site-outer .search-topsite[data-fallback]::before, .context-menu > ul > li > a,
   .top-site-outer .default-icon, .top-site-outer .search-topsite {
@@ -42,31 +37,64 @@ html {
 
   /* Top sites card hover border */
   [lwt-newtab-brighttext] .ds-top-sites .top-sites .top-site-outer .top-site-inner > a:-moz-any(:hover) .tile {
-    box-shadow: 0 0 0 3px var(--newtab-card-active-outline-color) !important;
+    box-shadow: 0 0 0 3px var(--pywalfox-background-light) !important;
   }
 
   /* Clock icon in new tab highlight cards */
-  .card > .card-details > .card-context {
+  [lwt-newtab-brighttext] .card > .card-details > .card-context {
     clip-path: none !important;
-    background-color: var(--pywalfox-background) !important;
+    background-color: var(--pywalfox-background-light) !important;
   }
 
-  /* "Top sites" and "Highlights" titles and icons */
-  .ds-header, .ds-layout .section-title span,
-  .ds-header .icon, .ds-layout .section-title span .icon {
+  /* "Highlights" domain name */
+  .card-outer .card-host-name {
+    color: var(--pywalfox-accent) !important;
+  }
+
+  /* "Highlights" context icon */
+  .card-outer .card-context-icon {
+    fill: var(--pywalfox-accent) !important;
+  }
+
+  /* "Top sites" and "Highlights" titles */
+  .ds-header, .ds-layout .section-title span {
     color: var(--newtab-text-primary-color) !important;
   }
 
+  /* "Top sites" and "Highlights" icons */
+  .ds-header .icon, .ds-layout .section-title span .icon {
+    fill: var(--newtab-text-primary-color) !important;
+  }
+
   /* Change card and search input background color based for dark mode */
+  [lwt-newtab-brighttext] .trailheadCard,
   [lwt-newtab-brighttext] .search-wrapper input,
+  [lwt-newtab-brighttext] .top-site-outer .top-site-icon,
   [lwt-newtab-brighttext] .ds-highlights .section .section-list .card-outer {
-    background-color: var(--newtab-card-background-color) !important;
+    background-color: var(--pywalfox-background-light) !important;
+  }
+
+  /* Card border when hovering in dark mode */
+  [lwt-newtab-brighttext] .card-outer:-moz-any(:hover, :focus, .active):not(.placeholder) {
+    box-shadow: 0 0 0 5px var(--pywalfox-background-light) !important;
+  }
+
+  /* Card border when hovering in light mode */
+  .card-outer:-moz-any(:hover, :focus, .active):not(.placeholder) {
+    box-shadow: 0 0 0 5px white !important;
   }
 
   /* Change and search input background color for light mode */
+  .trailheadCard,
   .search-wrapper input,
+  .top-site-outer .top-site-icon,
   .ds-highlights .section .section-list .card-outer {
     background-color: white !important;
+  }
+
+  /* Hides the active background of a section when opening a context menu */
+  .collapsible-section.active {
+    background: none !important;
   }
 }
 /********************* END PYWALFOX CUSTOM CSS *********************/
