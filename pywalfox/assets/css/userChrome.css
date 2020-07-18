@@ -25,7 +25,7 @@ button, search-textbox, menuseparator {
 menu[_moz-menuactive="true"], menuitem[_moz-menuactive="true"] {
   -moz-appearance: none !important;
   background-color: rgba(249, 249, 250, 0.1) !important;
-  padding: 5px 5px !important;
+  padding: 4px 4px !important;
 }
 
 /* Separators in dropwdown menus */
