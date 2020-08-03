@@ -61,7 +61,6 @@ def run_daemon():
 
     daemon = Daemon(python_version.major)
     daemon.start()
-    daemon.close()
 
 def handle_args(args):
     """Handles CLI arguments."""
@@ -76,7 +75,6 @@ def handle_args(args):
     if args.action == 'daemon':
         setup_logging(args.verbose, args.print_mode)
         run_daemon()
-        sys.exit(0)
 
     if args.action == 'log':
         open_log_file()

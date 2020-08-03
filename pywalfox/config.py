@@ -3,7 +3,9 @@ import os
 DAEMON_VERSION = '2.5'
 
 UNIX_SOCKET_PATH = '/tmp/pywalfox_socket'
+UNIX_SOCKET_PATH_ALT = '/tmp/pywalfox_socket_alt'
 WIN_SOCKET_HOST = ('127.0.0.1', 56744)
+WIN_SOCKET_HOST_ALT = ('127.0.0.1', 56745)
 
 SUPPORTED_BROWSERS = ['firefox']
 
