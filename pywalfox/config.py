@@ -1,6 +1,6 @@
 import os
 
-DAEMON_VERSION = '2.5'
+DAEMON_VERSION = '2.6'
 
 UNIX_SOCKET_PATH = '/tmp/pywalfox_socket'
 UNIX_SOCKET_PATH_ALT = '/tmp/pywalfox_socket_alt'
