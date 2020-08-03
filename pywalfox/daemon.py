@@ -1,5 +1,4 @@
 import sys
-import signal
 import logging
 from threading import Thread
 
@@ -28,9 +27,6 @@ class Daemon:
         self.messenger = Messenger(self.python_version)
         self.socket_server = Server()
         self.is_running = False
-
-        signal.signal(signal.SIGINT, self.close)
-        signal.signal(signal.SIGTERM, self.close)
 
     def set_chrome_path(self):
         """Tries to set the path to the chrome directory."""
@@ -208,7 +204,7 @@ class Daemon:
             logging.debug('Received message from extension: %s' % message)
             self.handle_message(message)
 
-    def close(self, signal, frame):
+    def close(self):
         """Application cleanup."""
         logging.debug('Running cleanup')
         self.is_running = False

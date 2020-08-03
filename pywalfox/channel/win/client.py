@@ -19,6 +19,6 @@ class Client(Connector):
             logging.debug('Successfully connected to UDP socket at: %s:%s' % (host[0], host[1]))
             return True
         except Exception as e:
-            logging.error('Failed to connect to socket: %s' % str(e))
+            logging.debug('Failed to connect to socket: %s' % str(e))
 
         return False

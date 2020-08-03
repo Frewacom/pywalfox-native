@@ -23,6 +23,6 @@ class Client(Connector):
             except OSError as e:
                 logging.error('Failed to connect to socket: %s' % e.strerror)
         else:
-            logging.error('Could not find socket: %s' % host)
+            logging.debug('Could not find socket: %s' % host)
 
         return False

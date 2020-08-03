@@ -1,5 +1,6 @@
 import os
 import sys
+import atexit
 import logging
 import argparse
 import subprocess
@@ -58,9 +59,8 @@ def print_version():
 
 def run_daemon():
     """Starts the daemon."""
-    python_version = get_python_version()
-
-    daemon = Daemon(python_version.major)
+    daemon = Daemon(get_python_version().major)
+    atexit.register(daemon.close)
     daemon.start()
 
 def handle_args(args):
