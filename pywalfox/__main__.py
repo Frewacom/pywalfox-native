@@ -34,10 +34,11 @@ def get_python_version():
 def send_update_action():
     """Sends the update command to the socket server."""
     client = Client()
-    connected = client.start()
 
-    if connected is True:
-        client.send_message('update')
+    for host in client.hosts:
+        connected = client.connect(host)
+        if connected is True:
+            client.send_message('update')
 
 def open_log_file():
     """Opens the daemon log file in an editor."""

@@ -10,14 +10,21 @@ class Connector:
     since UNIX-sockets are not properly supported on Windows.
 
     :param platform_id str: the current platform identifier, e.g. win32
+    :param validate_host bool: check if the socket host is available before binding
     """
-    def __init__(self, platform_id):
+    def __init__(self, platform_id, validate_host=True):
         if platform_id == 'win32':
-            self.host = self.get_win_socket_host()
+            if validate_host is True:
+                self.host = self.get_win_socket_host()
+
+            self.hosts = [WIN_SOCKET_HOST, WIN_SOCKET_HOST_ALT]
             self.socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
             logging.debug('Setup socket server using AF_INET (win32)')
         else:
-            self.host = self.get_unix_socket_path()
+            if validate_host is True:
+                self.host = self.get_unix_socket_path()
+
+            self.hosts = [UNIX_SOCKET_PATH, UNIX_SOCKET_PATH_ALT]
             self.socket = socket.socket(socket.AF_UNIX, socket.SOCK_DGRAM)
             logging.debug('Setup socket server using AF_UNIX (linux/darwin)')
 
