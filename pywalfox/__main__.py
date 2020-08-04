@@ -15,10 +15,29 @@ else:
     from .channel.unix.client import Client
 
 parser = argparse.ArgumentParser(description='Pywalfox - Native messaging host')
-parser.add_argument('action', nargs='?', default=None, help='available options are setup, update, daemon, log and uninstall')
-parser.add_argument('--verbose', dest='verbose', action='store_true', help='runs the daemon in verbose mode with debugging output')
-parser.add_argument('-p', '--print', dest='print_mode', action='store_true', help='prints the debugging output instead of writing to logfile')
-parser.add_argument('-v', '--version', dest='version', action='store_true', help='displays the current version of the daemon')
+setup_group = parser.add_argument_group('install/uninstall')
+start_group = parser.add_argument_group('start')
+parser.add_argument('action',
+        nargs='?',
+        default=None,
+        metavar='ACTION',
+        help='available actions are install, start, update, log and uninstall')
+parser.add_argument('-v', '--version',
+        dest='version',
+        action='store_true',
+        help='displays the current version of the daemon')
+start_group.add_argument('-p', '--print',
+        dest='print_mode',
+        action='store_true',
+        help='writes debugging output from the native messaging host to stdout')
+start_group.add_argument('--verbose',
+        dest='verbose',
+        action='store_true',
+        help='runs the native messaging host in verbose mode')
+setup_group.add_argument('-g', '--global',
+        dest='global_install',
+        action='store_true',
+        help='installs/uninstalls the native host manifest globally')
 
 def get_python_version():
     """Gets the current python version and checks if it is supported."""
@@ -73,7 +92,7 @@ def handle_args(args):
         send_update_action()
         sys.exit(0)
 
-    if args.action == 'daemon':
+    if args.action == 'start':
         setup_logging(args.verbose, args.print_mode)
         run_daemon()
 
@@ -81,14 +100,14 @@ def handle_args(args):
         open_log_file()
         sys.exit(0)
 
-    if args.action == 'setup':
+    if args.action == 'install':
         from pywalfox.install import start_setup
-        start_setup(True)
+        start_setup(args.global_install)
         sys.exit(0)
 
     if args.action == 'uninstall':
         from pywalfox.install import start_uninstall
-        start_uninstall(True)
+        start_uninstall(args.global_install)
         sys.exit(0)
 
     # If no action was specified

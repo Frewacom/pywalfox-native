@@ -1,3 +1,3 @@
 @echo off
 
-python -m pywalfox daemon || python3 -m pywalfox daemon || python2.7 -m pywalfox daemon
+python -m pywalfox start || python3 -m pywalfox start || python2.7 -m pywalfox start
