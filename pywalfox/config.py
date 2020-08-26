@@ -9,7 +9,7 @@ SUPPORTED_BROWSERS = ['firefox']
 
 HOME_PATH = os.path.expanduser('~')
 XDG_CACHE_DIR = os.getenv('XDG_CACHE_HOME', os.path.join(HOME_PATH, '.cache'))
-PYWAL_COLORS_PATH = os.path.join(XDG_CACHE_DIR, 'wal/colors')
+PYWAL_COLORS_PATH = os.path.join(XDG_CACHE_DIR, 'wal/colors.json')
 
 APP_PATH = os.path.dirname(os.path.abspath(__file__))
 BIN_PATH_UNIX = os.path.join(APP_PATH, 'bin/main.sh')

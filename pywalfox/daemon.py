@@ -73,10 +73,10 @@ class Daemon:
 
     def send_pywal_colors(self):
         """Sends the current colorscheme to the extension."""
-        (success, colors, message) = get_pywal_colors()
+        (success, pywal_data, message) = get_pywal_colors()
         self.messenger.send_message(Message(
             ACTIONS['COLORS'],
-            data=colors,
+            data=pywal_data,
             success=success,
             message=message,
         ))
