@@ -2,7 +2,7 @@
 #main-window {
   --pywalfox-font-size: 13px;
   --pywalfox-font-size-sm: calc(var(--pywalfox-font-size) * 0.9);
-  --pywalfox-background: var(--lwt-toolbarbutton-active-background);
+  --pywalfox-background: var(--lwt-accent-color);
   --pywalfox-background-light: var(--arrowpanel-background);
   --pywalfox-text: var(--arrowpanel-color);
   --pywalfox-unselected-tab-opacity: 0.8;
@@ -72,13 +72,13 @@ panelmultiview {
 
 /* Change the grey background color seen e.g. when opening a bookmark in a newtab */
 #tabbrowser-tabpanels {
-  background-color: var(--pywalfox-darker-background) !important;
+  background-color: var(--pywalfox-background) !important;
 }
 
 /* Theme the status panel at the bottom */
 #statuspanel-label {
-  background: var(--pywalfox-background) !important;
-  border-color: var(--pywalfox-darker-background) !important;
+  background: var(--pywalfox-background-light) !important;
+  border-color: var(--pywalfox-background) !important;
+  color: var(--pywalfox-text) !important;
 }
 /********************* END PYWALFOX CUSTOM CSS *********************/
-
