@@ -69,5 +69,16 @@ textbox, panelview, .tabbrowser-tab, #sidebar-header,
 panelmultiview {
   font-size: var(--pywalfox-font-size-sm) !important;
 }
+
+/* Change the grey background color seen e.g. when opening a bookmark in a newtab */
+#tabbrowser-tabpanels {
+  background-color: var(--pywalfox-darker-background) !important;
+}
+
+/* Theme the status panel at the bottom */
+#statuspanel-label {
+  background: var(--pywalfox-background) !important;
+  border-color: var(--pywalfox-darker-background) !important;
+}
 /********************* END PYWALFOX CUSTOM CSS *********************/
 
