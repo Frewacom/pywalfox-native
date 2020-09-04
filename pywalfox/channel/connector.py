@@ -1,7 +1,7 @@
+import os
 import socket
 import logging
-from ..config import UNIX_SOCKET_PATH, WIN_SOCKET_HOST
-
+from ..config import UNIX_SOCKET_PATH, WIN_SOCKET_HOST, UNIX_SOCKET_PATH_ALT, WIN_SOCKET_HOST_ALT
 
 class Connector:
     """
@@ -10,16 +10,60 @@ class Connector:
     since UNIX-sockets are not properly supported on Windows.
 
     :param platform_id str: the current platform identifier, e.g. win32
+    :param validate_host bool: check if the socket host is available before binding
     """
-    def __init__(self, platform_id):
+    def __init__(self, platform_id, validate_host=True):
         if platform_id == 'win32':
-            self.host = WIN_SOCKET_HOST
+            if validate_host is True:
+                self.host = self.get_win_socket_host()
+
+            self.hosts = [WIN_SOCKET_HOST, WIN_SOCKET_HOST_ALT]
             self.socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
             logging.debug('Setup socket server using AF_INET (win32)')
         else:
-            self.host = UNIX_SOCKET_PATH
+            if validate_host is True:
+                self.host = self.get_unix_socket_path()
+
+            self.hosts = [UNIX_SOCKET_PATH, UNIX_SOCKET_PATH_ALT]
             self.socket = socket.socket(socket.AF_UNIX, socket.SOCK_DGRAM)
             logging.debug('Setup socket server using AF_UNIX (linux/darwin)')
+
+    def get_unix_socket_path(self):
+        """
+        Get an available path to bind the UNIX-socket to.
+
+        :return: the path to be used when binding the UNIX-socket
+        :rType: str
+        """
+        if os.path.exists(UNIX_SOCKET_PATH):
+            logging.debug('Default UNIX-socket is already in use')
+            return UNIX_SOCKET_PATH_ALT
+
+        return UNIX_SOCKET_PATH
+
+    def get_win_socket_host(self):
+        """
+        Get an available host and port to bind the UDP-socket to.
+
+        :return: the host and port to be used when binding the UDP-socket
+        :rType: (host, port)
+        """
+        is_valid = True
+        test_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        try:
+            test_socket.bind(WIN_SOCKET_HOST)
+            test_socket.close()
+        except OSError as e:
+            is_valid = False
+            if e.errno == 98: # errno 98 means that address is already bound
+                logging.debug('Default UDP-socket host is already in use')
+            else:
+                logging.error('Failed to test UDP-socket host availability: %s' % str(e))
+
+        if is_valid is True:
+            return WIN_SOCKET_HOST
+
+        return WIN_SOCKET_HOST_ALT
 
     def encode_message(self, message):
         """

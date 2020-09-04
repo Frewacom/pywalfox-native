@@ -33,4 +33,14 @@ class Server(Connector):
     def close(self):
         """Unbinds the socket and deletes the file."""
         self.socket.close()
-        os.remove(self.host)
+
+        try:
+            """
+            UNIX-sockets can be overwritten by other processes even if another process
+            is already using it. This may lead to the file not existing and will
+            cause a crash if not handled properly.
+            """
+            os.remove(self.host)
+            logging.debug('UNIX-socket deleted')
+        except OSError as e:
+            logging.debug('UNIX-socket has already been deleted, skipping')

@@ -37,7 +37,7 @@ def create_hosts_directory(hosts_path):
     if not os.path.exists(hosts_path):
         os.makedirs(hosts_path)
 
-def remove_existing_manifest(full_path):
+def remove_existing_manifest(full_path, print_errors=True):
     """
     Removes an existing manifest.
 
@@ -46,9 +46,24 @@ def remove_existing_manifest(full_path):
     try:
         if os.path.isfile(full_path):
             os.remove(full_path)
+            print('Successfully removed manifest at: %s' % full_path)
+        else:
+            if print_errors is True:
+                print('No manifest is installed at: %s' % full_path)
     except Exception as e:
-        print('Could not remove existing manifest at: %s\n\t%s' % (full_path, str(e)))
-        sys.exit(1)
+        if print_errors is True:
+            if e.errno == 13: # permission error
+                print('Permission denied when trying to remove the manifest.')
+                print('If you are trying to install it globally, rerun this script with admin privileges.')
+                print('')
+                print('If you installed Pywalfox for your user only, you must probably use something like this:')
+                print('sudo python -m pywalfox uninstall')
+            else:
+                print('Could not remove existing manifest at: %s\n\t%s' % (full_path, str(e)))
+
+            sys.exit(1)
+        else:
+            raise e
 
 def normalize_path(target_path):
     """
@@ -85,14 +100,22 @@ def copy_manifest(target_path, bin_path):
     :param bin_path str: the path to the daemon executable
     """
     full_path = get_full_manifest_path(target_path)
-    create_hosts_directory(target_path)
-    remove_existing_manifest(full_path)
 
     try:
+        create_hosts_directory(target_path)
+        remove_existing_manifest(full_path, False)
         shutil.copyfile(MANIFEST_SRC_PATH, full_path)
         print('Copied manifest to: %s' % full_path)
     except Exception as e:
-        print('Could not copy manifest to: %s\n\t%s' % (full_path, str(e)))
+        if e.errno == 13: # permission error
+            print('Permission denied when trying to install the manifest.')
+            print('If you are trying to install it globally, rerun this script with admin privileges.')
+            print('')
+            print('If you installed Pywalfox for your user only, you must probably use something like this:')
+            print('sudo python -m pywalfox install')
+        else:
+            print('Failed to install manifest: %s:\n%s' % (full_path, str(e)))
+
         sys.exit(1)
 
     set_daemon_path(full_path, bin_path)
@@ -115,19 +138,19 @@ def set_executable_permissions(bin_path):
         print('Try setting the permissions manually using: chmod +x')
         sys.exit(1)
 
-def get_target_path_key(user_only):
+def get_target_path_key(global_install):
     """
     Gets the path key for the 'native-messaging-hosts' directory based on
     if the manifest should be installed locally or globally.
 
-    :param user_only bool: if the manifest should be installed for the current user only
+    :param global_install bool: if the manifest should be installed for all users
     :return: the key in MANIFEST_TARGET_PATHS_* corresponding to the manifest path
     :rType: str
     """
-    if user_only is True:
-        return 'FIREFOX_USER'
-    else:
+    if global_install is True:
         return 'FIREFOX'
+    else:
+        return 'FIREFOX_USER'
 
 def setup_register(manifest_path_key):
     """
@@ -192,13 +215,21 @@ def darwin_setup(manifest_path_key):
     copy_manifest(manifest_path, BIN_PATH_UNIX)
     set_executable_permissions(BIN_PATH_UNIX)
 
-def start_setup(user_only):
+def validate_permissions(global_install):
+    if os.geteuid() == 0 and global_install is False:
+        print('You are running the script as root, but did not specify the --global option.')
+        selection = input('Things may not work as expected, continue? (y/N): ')
+        if selection.lower() != 'y' and selection.lower() != 'yes':
+            sys.exit(1)
+
+def start_setup(global_install):
     """
     Installs the native messaging host manifest.
 
-    :param user_only bool: if the manifest should be installed for the current user only
+    :param global_install bool: if the manifest should be installed for all users
     """
-    manifest_path_key = get_target_path_key(user_only)
+    validate_permissions(global_install)
+    manifest_path_key = get_target_path_key(global_install)
 
     if sys.platform.startswith('win32'):
         win_setup(manifest_path_key)
@@ -207,13 +238,14 @@ def start_setup(user_only):
     else:
         linux_setup(manifest_path_key)
 
-def start_uninstall(user_only):
+def start_uninstall(global_install):
     """
     Tries to remove an existing manifest and delete registry keys (win32).
 
-    :param user_only bool: if the manifest should be uninstalled for the current user only
+    :param global_install bool: if the manifest should be uninstalled for all users
     """
-    manifest_path_key = get_target_path_key(user_only)
+    validate_permissions(global_install)
+    manifest_path_key = get_target_path_key(global_install)
 
     if sys.platform.startswith('win32'):
         manifest_path = MANIFEST_TARGET_PATH_WIN

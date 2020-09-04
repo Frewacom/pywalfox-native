@@ -198,16 +198,15 @@ class Daemon:
         """Starts the daemon and listens for incoming messages."""
         self.is_running = True
         self.start_socket_server()
-        try:
-            while True:
-                message = self.messenger.get_message()
-                logging.debug('Received message from extension: %s' % message)
-                self.handle_message(message)
-        except KeyboardInterrupt:
-            return
+
+        while self.is_running:
+            message = self.messenger.get_message()
+            logging.debug('Received message from extension: %s' % message)
+            self.handle_message(message)
 
     def close(self):
         """Application cleanup."""
-        self.socket_server.close()
+        logging.debug('Running cleanup')
         self.is_running = False
-        logging.debug('Cleanup')
+        self.socket_server.close()
+        sys.exit(0)

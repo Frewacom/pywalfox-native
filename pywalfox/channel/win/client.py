@@ -5,9 +5,9 @@ from ..connector import Connector
 class Client(Connector):
     """UDP-socket client used to communicate with the daemon."""
     def __init__(self):
-        Connector.__init__(self, 'win32')
+        Connector.__init__(self, 'win32', False)
 
-    def start(self):
+    def connect(self, host):
         """
         Connects to the UDP socket.
 
@@ -15,10 +15,10 @@ class Client(Connector):
         :rType: bool
         """
         try:
-            self.socket.connect(self.host)
-            logging.debug('Successfully connected to UDP socket at: %s:%s' % (self.host[0], self.host[1]))
+            self.socket.connect(host)
+            logging.debug('Successfully connected to UDP socket at: %s:%s' % (host[0], host[1]))
             return True
         except Exception as e:
-            logging.error('Failed to connect to socket: %s' % str(e))
+            logging.debug('Failed to connect to socket: %s' % str(e))
 
         return False
