@@ -215,20 +215,12 @@ def darwin_setup(manifest_path_key):
     copy_manifest(manifest_path, BIN_PATH_UNIX)
     set_executable_permissions(BIN_PATH_UNIX)
 
-def validate_permissions(global_install):
-    if os.geteuid() == 0 and global_install is False:
-        print('You are running the script as root, but did not specify the --global option.')
-        selection = input('Things may not work as expected, continue? (y/N): ')
-        if selection.lower() != 'y' and selection.lower() != 'yes':
-            sys.exit(1)
-
 def start_setup(global_install):
     """
     Installs the native messaging host manifest.
 
     :param global_install bool: if the manifest should be installed for all users
     """
-    validate_permissions(global_install)
     manifest_path_key = get_target_path_key(global_install)
 
     if sys.platform.startswith('win32'):
@@ -244,7 +236,6 @@ def start_uninstall(global_install):
 
     :param global_install bool: if the manifest should be uninstalled for all users
     """
-    validate_permissions(global_install)
     manifest_path_key = get_target_path_key(global_install)
 
     if sys.platform.startswith('win32'):
