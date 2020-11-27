@@ -5,7 +5,7 @@ from threading import Thread
 from .fetcher import get_pywal_colors
 from .custom_css import get_firefox_chrome_path, enable_custom_css, set_font_size, disable_custom_css
 
-from .config import DAEMON_VERSION, ACTIONS
+from .config import DAEMON_VERSION, ACTIONS, COMMANDS
 from .response import Message
 from .messenger import Messenger
 
@@ -149,6 +149,17 @@ class Daemon:
                         message=message,
                     ))
 
+    def send_theme_mode(self, mode):
+        """
+        Sends the new theme mode to be activated.
+
+        :param mode string: the new theme mode (dark/light)
+        """
+        self.messenger.send_message(Message(
+            ACTIONS['THEME_MODE'],
+            data=mode,
+        ))
+
     def handle_message(self, message):
         """
         Handles the incoming messages and does the appropriate action.
@@ -178,9 +189,18 @@ class Daemon:
         """The socket server thread worker."""
         while True:
             message = self.socket_server.get_message()
-            if message == 'update':
-                logging.debug('Update triggered from external script')
+            if message == COMMANDS['UPDATE']:
+                logging.debug('CLI: Update pywal colors')
                 self.send_pywal_colors()
+            elif message == COMMANDS['THEME_MODE_DARK']:
+                logging.debug('CLI: Set theme mode to dark')
+                self.send_theme_mode('dark')
+            elif message == COMMANDS['THEME_MODE_LIGHT']:
+                logging.debug('CLI: Set theme mode to light')
+                self.send_theme_mode('light')
+            elif message == COMMANDS['THEME_MODE_AUTO']:
+                logging.debug('CLI: Set theme mode to auto')
+                self.send_theme_mode('auto')
 
     def start_socket_server(self):
         """Starts the socket server and creates the socket thread."""

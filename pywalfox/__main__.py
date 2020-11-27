@@ -7,7 +7,7 @@ import subprocess
 
 from .daemon import Daemon
 from .utils.logger import setup_logging
-from .config import DAEMON_VERSION, LOG_FILE_PATH
+from .config import DAEMON_VERSION, LOG_FILE_PATH, COMMANDS
 
 if sys.platform.startswith('win32'):
     from .channel.win.client import Client
@@ -21,7 +21,7 @@ parser.add_argument('action',
         nargs='?',
         default=None,
         metavar='ACTION',
-        help='available actions are install, start, update, log and uninstall')
+        help='available actions are install, uninstall, start, update, log, dark, light and auto')
 parser.add_argument('-v', '--version',
         dest='version',
         action='store_true',
@@ -51,14 +51,31 @@ def get_python_version():
 
     return python_version
 
-def send_update_action():
-    """Sends the update command to the socket server."""
+def send_client_command(message):
+    """
+    Sends a message to the socket server.
+
+    :param message str: the message to send
+    """
     client = Client()
 
     for host in client.hosts:
         connected = client.connect(host)
         if connected is True:
-            client.send_message('update')
+            client.send_message(message)
+
+def send_update_action():
+    """Sends an update command to the addon, triggering a refetch of colors"""
+    send_client_command(COMMANDS['UPDATE'])
+
+def send_theme_mode_dark():
+    send_client_command(COMMANDS['THEME_MODE_DARK'])
+
+def send_theme_mode_light():
+    send_client_command(COMMANDS['THEME_MODE_LIGHT'])
+
+def send_theme_mode_auto():
+    send_client_command(COMMANDS['THEME_MODE_AUTO'])
 
 def open_log_file():
     """Opens the daemon log file in an editor."""
@@ -90,6 +107,18 @@ def handle_args(args):
 
     if args.action == 'update':
         send_update_action()
+        sys.exit(0)
+
+    if args.action == 'dark':
+        send_theme_mode_dark()
+        sys.exit(0)
+
+    if args.action == 'light':
+        send_theme_mode_light()
+        sys.exit(0)
+
+    if args.action == 'auto':
+        send_theme_mode_auto()
         sys.exit(0)
 
     if args.action == 'start':

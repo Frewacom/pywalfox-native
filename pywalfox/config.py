@@ -1,6 +1,6 @@
 import os
 
-DAEMON_VERSION = '2.7'
+DAEMON_VERSION = '2.7.1'
 
 UNIX_SOCKET_PATH = '/tmp/pywalfox_socket'
 UNIX_SOCKET_PATH_ALT = '/tmp/pywalfox_socket_alt'
@@ -36,4 +36,12 @@ ACTIONS = {
     'CSS_ENABLE': 'css:enable',
     'CSS_DISABLE': 'css:disable',
     'CSS_FONT_SIZE': 'css:font:size',
+    'THEME_MODE': 'theme:mode',
+}
+
+COMMANDS = {
+    'THEME_MODE_DARK': 'theme:mode:dark',
+    'THEME_MODE_LIGHT': 'theme:mode:light',
+    'THEME_MODE_AUTO': 'theme:mode:auto',
+    'UPDATE': 'action:update',
 }
