@@ -15,6 +15,18 @@ html {
     --newtab-snippets-background-color: var(--pywalfox-background-light) !important;
     --newtab-contextmenu-button-color: var(--pywalfox-background) !important;
     --newtab-contextmenu-background-color: var(--pywalfox-background-light) !important;
+
+    /* Firefox 89 */
+    --newtab-topsites-background-color: var(--pywalfox-background-light) !important;
+    --newtab-textbox-background-color: var(--pywalfox-background-light) !important;
+    --customize-menu-background: var(--pywalfox-background-light) !important;
+    --customize-menu-secondary-action-background: var(--pywalfox-background) !important;
+    --customize-menu-secondary-action-background-hover: var(--pywalfox-background) !important;
+    --newtab-primary-action-background: var(--pywalfox-accent) !important;
+    --newtab-primary-action-background-off: var(--pywalfox-background) !important;
+    --customize-menu-line-color: var(--pywalfox-accent) !important;
+    --newtab-background-button-color: var(--pywalfox-background-light) !important;
+    --newtab-background-button-hover-color: var(--pywalfox-background-light) !important;
   }
 
   /* Add bold text to most text */
@@ -23,6 +35,11 @@ html {
   .top-site-outer .default-icon, .top-site-outer .search-topsite {
     font-weight: bold !important;
     font-size: var(--pywalfox-font-size-sm);
+  }
+
+  /* Bold text to activity card page labels */
+  .ds-highlights .section .section-list .card-outer .card-host-name {
+    font-weight: bold;
   }
 
   /* Remove box shadow border from top sites cards */
@@ -96,6 +113,15 @@ html {
   .collapsible-section.active {
     background: none !important;
   }
+
+  .personalize-button:hover,
+  .customize-menu .close-button:hover {
+    filter: brightness(80%);
+  }
+
+  [lwt-newtab-brighttext] .personalize-button:hover,
+  [lwt-newtab-brighttext] .customize-menu .close-button:hover {
+    filter: brightness(120%);
+  }
 }
 /********************* END PYWALFOX CUSTOM CSS *********************/
-
