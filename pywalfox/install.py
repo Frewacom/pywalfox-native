@@ -3,7 +3,7 @@ import sys
 import shutil
 import fileinput
 
-from .config import APP_PATH, HOME_PATH, BIN_PATH_UNIX, BIN_PATH_WIN
+from .config import APP_PATH, HOME_PATH
 
 if sys.platform.startswith('win32'):
     try:
@@ -90,7 +90,7 @@ def set_daemon_path(manifest_path, bin_path):
         line = line.replace("<path>", normalized_path)
         print(line.rstrip('\n'))
 
-    print('Set daemon executable path to: %s' % normalized_path)
+    print('Set executable path in manifest to: %s' % normalized_path)
 
 def copy_manifest(target_path, bin_path):
     """
@@ -119,24 +119,6 @@ def copy_manifest(target_path, bin_path):
         sys.exit(1)
 
     set_daemon_path(full_path, bin_path)
-
-def set_executable_permissions(bin_path):
-    """
-    Sets the execution permission on the daemon executable.
-    https://stackoverflow.com/questions/12791997/how-do-you-do-a-simple-chmod-x-from-within-python
-
-    :param bin_path str: the path to the daemon executable
-    """
-    try:
-        mode = os.stat(bin_path).st_mode
-        mode |= (mode & 0o444) >> 2    # copy R bits to X
-        os.chmod(bin_path, mode)
-        print('Set execute permissions on daemon executable')
-    except Exception as e:
-        print('Failed to set executable permissions on: %s\n\t%s' % (bin_path, str(e)))
-        print('')
-        print('Try setting the permissions manually using: chmod +x')
-        sys.exit(1)
 
 def get_target_path_key(global_install):
     """
@@ -182,7 +164,7 @@ def delete_registry_keys(manifest_path_key):
         print('Failed to remove existing registry key: %s' % str(e))
         return
 
-def win_setup(manifest_path_key):
+def win_setup(manifest_path_key, bin_path):
     """Windows installation."""
     hkey = setup_register(manifest_path_key)
 
@@ -201,34 +183,34 @@ def win_setup(manifest_path_key):
         print('Failed to set registry key: %s\n%s' % (reg_key, str(e)))
         sys.exit(1)
 
-    copy_manifest(MANIFEST_TARGET_PATH_WIN, BIN_PATH_WIN)
+    copy_manifest(MANIFEST_TARGET_PATH_WIN, bin_path)
 
-def linux_setup(manifest_path_key):
+def linux_setup(manifest_path_key, bin_path):
     """Linux installation."""
     manifest_path = MANIFEST_TARGET_PATHS_LINUX[manifest_path_key]
-    copy_manifest(manifest_path, BIN_PATH_UNIX)
-    set_executable_permissions(BIN_PATH_UNIX)
+    copy_manifest(manifest_path, bin_path)
 
-def darwin_setup(manifest_path_key):
+def darwin_setup(manifest_path_key, bin_path):
     """MacOS installation."""
     manifest_path = MANIFEST_TARGET_PATHS_DARWIN[manifest_path_key]
-    copy_manifest(manifest_path, BIN_PATH_UNIX)
-    set_executable_permissions(BIN_PATH_UNIX)
+    copy_manifest(manifest_path, bin_path)
 
-def start_setup(global_install):
+def start_setup(global_install, bin_path):
     """
     Installs the native messaging host manifest.
 
     :param global_install bool: if the manifest should be installed for all users
     """
+    print('Using executable path: %s' % (bin_path))
+
     manifest_path_key = get_target_path_key(global_install)
 
     if sys.platform.startswith('win32'):
-        win_setup(manifest_path_key)
+        win_setup(manifest_path_key, bin_path)
     elif sys.platform.startswith('darwin'):
-        darwin_setup(manifest_path_key)
+        darwin_setup(manifest_path_key, bin_path)
     else:
-        linux_setup(manifest_path_key)
+        linux_setup(manifest_path_key, bin_path)
 
 def start_uninstall(global_install):
     """
