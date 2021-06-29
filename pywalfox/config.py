@@ -1,4 +1,5 @@
 import os
+import sys
 
 DAEMON_VERSION = '2.7.3'
 
@@ -13,10 +14,11 @@ HOME_PATH = os.path.expanduser('~')
 XDG_CACHE_DIR = os.getenv('XDG_CACHE_HOME', os.path.join(HOME_PATH, '.cache'))
 PYWAL_COLORS_PATH = os.path.join(XDG_CACHE_DIR, os.path.join('wal', 'colors.json'))
 
+# This will be set to the executable path by pip
+EXECUTABLE_PATH = sys.argv[0]
+
 APP_PATH = os.path.dirname(os.path.abspath(__file__))
 CSS_PATH = os.path.join(APP_PATH, 'assets/css')
-BIN_PATH_WIN = os.path.join(APP_PATH, 'bin/win.bat')
-BIN_PATH_UNIX = os.path.join(APP_PATH, 'bin/main.sh')
 
 FIREFOX_PROFILES_PATH_LINUX = os.path.join(HOME_PATH, '.mozilla/firefox')
 FIREFOX_PROFILES_PATH_WIN = os.path.join(HOME_PATH, 'AppData/Roaming/Mozilla/Firefox')

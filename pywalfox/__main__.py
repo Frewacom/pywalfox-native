@@ -7,16 +7,36 @@ import subprocess
 
 from .daemon import Daemon
 from .utils.logger import setup_logging
-from .config import DAEMON_VERSION, LOG_FILE_PATH, COMMANDS
+from .config import DAEMON_VERSION, LOG_FILE_PATH, COMMANDS, EXECUTABLE_PATH
 
 if sys.platform.startswith('win32'):
     from .channel.win.client import Client
 else:
     from .channel.unix.client import Client
 
+# This is an ugly fix that is needed to be able to execute
+# pywalfox from Firefox without using a separate shell script.
+#
+# Firefox passes in a few arguments to the executable which are not valid
+# arguments for the executable. To circumvent this, we need to ignore the
+# errors and simply start the executable anyway.
+#
+# https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/Native_messaging#exchanging_messages
+def handle_error(self, message=None):
+    if len(sys.argv) == 3 and sys.argv[2] == 'pywalfox@frewacom.org':
+        setup_logging(False, False)
+        run_daemon()
+    else:
+        parser.print_help()
+        sys.exit(1)
+
 parser = argparse.ArgumentParser(description='Pywalfox - Native messaging host')
+
+# Register custom error handler
+parser.error = handle_error
+
 setup_group = parser.add_argument_group('install/uninstall')
-start_group = parser.add_argument_group('start')
+start_group = parser.add_argument_group('messaging host')
 parser.add_argument('action',
         nargs='?',
         default=None,
@@ -38,6 +58,12 @@ setup_group.add_argument('-g', '--global',
         dest='global_install',
         action='store_true',
         help='installs/uninstalls the native host manifest globally')
+setup_group.add_argument('--executable',
+        dest='custom_path',
+        default=EXECUTABLE_PATH,
+        nargs='?',
+        type=str,
+        help='use a custom path for the `pywalfox` executable')
 
 def get_python_version():
     """Gets the current python version and checks if it is supported."""
@@ -121,17 +147,30 @@ def handle_args(args):
         send_theme_mode_auto()
         sys.exit(0)
 
-    if args.action == 'start':
-        setup_logging(args.verbose, args.print_mode)
-        run_daemon()
-
     if args.action == 'log':
         open_log_file()
         sys.exit(0)
 
+    if args.action == 'start':
+        setup_logging(args.verbose, args.print_mode)
+        run_daemon()
+
     if args.action == 'install':
         from pywalfox.install import start_setup
-        start_setup(args.global_install)
+
+        path_to_use = EXECUTABLE_PATH
+
+        if not args.custom_path:
+            path_to_use = EXECUTABLE_PATH
+        else:
+            path_to_use = args.custom_path
+
+        if not os.path.exists(path_to_use) or not os.path.isfile(path_to_use):
+            print('Could not find executable path, please re-run the installation:')
+            print('pywalfox install --executable <path-to-pywalfox-executable>')
+            sys.exit(1)
+
+        start_setup(args.global_install, path_to_use)
         sys.exit(0)
 
     if args.action == 'uninstall':
@@ -139,7 +178,6 @@ def handle_args(args):
         start_uninstall(args.global_install)
         sys.exit(0)
 
-    # If no action was specified
     parser.print_help()
 
 def main():
