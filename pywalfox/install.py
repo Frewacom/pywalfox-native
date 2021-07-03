@@ -11,7 +11,6 @@ if sys.platform.startswith('win32'):
     except ImportError:
         import winreg
 
-# We only need these variables when running the setup, so might as well define them here.
 MANIFEST_SRC_PATH = os.path.join(APP_PATH, 'assets/manifest.json')
 MANIFEST_TARGET_NAME = 'pywalfox.json'
 
@@ -21,11 +20,15 @@ MANIFEST_TARGET_PATH_WIN = os.path.join(HOME_PATH, '.pywalfox')
 MANIFEST_TARGET_PATHS_LINUX = {
     'FIREFOX': os.path.join('/usr/lib/mozilla/native-messaging-hosts'),
     'FIREFOX_USER': os.path.join(HOME_PATH, '.mozilla/native-messaging-hosts'),
+    'LIBREWOLF': os.path.join('/usr/lib/librewolf/native-messaging-hosts'),
+    'LIBREWOLF_USER': os.path.join(HOME_PATH, '.librewolf/native-messaging-hosts'),
 }
 
 MANIFEST_TARGET_PATHS_DARWIN = {
     'FIREFOX': os.path.join('/Library/Application Support/Mozilla/NativeMessagingHosts'),
     'FIREFOX_USER': os.path.join(HOME_PATH, 'Library/Application Support/Mozilla/NativeMessagingHosts'),
+    'LIBREWOLF': os.path.join('/Library/Application Support/Librewolf/NativeMessagingHosts'),
+    'LIBREWOLF_USER': os.path.join(HOME_PATH, 'Library/Application Support/Librewolf/NativeMessagingHosts'),
 }
 
 def create_hosts_directory(hosts_path):
@@ -120,24 +123,30 @@ def copy_manifest(target_path, bin_path):
 
     set_daemon_path(full_path, bin_path)
 
-def get_target_path_key(global_install):
+def get_target_path_key(global_install, target_browser):
     """
     Gets the path key for the 'native-messaging-hosts' directory based on
     if the manifest should be installed locally or globally.
 
     :param global_install bool: if the manifest should be installed for all users
+    :param target_browser bool: the browser to install the manifest to
     :return: the key in MANIFEST_TARGET_PATHS_* corresponding to the manifest path
     :rType: str
     """
+    browser_prefix = 'FIREFOX'
+
+    if target_browser == 'librewolf':
+        browser_prefix = 'LIBREWOLF'
+
     if global_install is True:
-        return 'FIREFOX'
+        return browser_prefix
     else:
-        return 'FIREFOX_USER'
+        return '%s_USER' % (browser_prefix)
 
 def setup_register(manifest_path_key):
     """
-    Imports the winreg module and returns the hkey based on if the
-    manifest should be installed for the current user only, or for all users.
+    Returns the hkey based on if the manifest should be
+    installed for the current user only, or for all users.
     """
     hkey = winreg.HKEY_CURRENT_USER
     if manifest_path_key == 'FIREFOX':
@@ -195,7 +204,12 @@ def darwin_setup(manifest_path_key, bin_path):
     manifest_path = MANIFEST_TARGET_PATHS_DARWIN[manifest_path_key]
     copy_manifest(manifest_path, bin_path)
 
-def start_setup(global_install, bin_path):
+def win_validate_browser(target_browser):
+    if target_browser != 'firefox':
+        print('This browser is currently not supported by the Windows pywalfox installer')
+        sys.exit(1)
+
+def start_setup(global_install, bin_path, target_browser):
     """
     Installs the native messaging host manifest.
 
@@ -203,24 +217,26 @@ def start_setup(global_install, bin_path):
     """
     print('Using executable path: %s' % (bin_path))
 
-    manifest_path_key = get_target_path_key(global_install)
+    manifest_path_key = get_target_path_key(global_install, target_browser)
 
     if sys.platform.startswith('win32'):
+        win_validate_browser(target_browser)
         win_setup(manifest_path_key, bin_path)
     elif sys.platform.startswith('darwin'):
         darwin_setup(manifest_path_key, bin_path)
     else:
         linux_setup(manifest_path_key, bin_path)
 
-def start_uninstall(global_install):
+def start_uninstall(global_install, target_browser):
     """
     Tries to remove an existing manifest and delete registry keys (win32).
 
     :param global_install bool: if the manifest should be uninstalled for all users
     """
-    manifest_path_key = get_target_path_key(global_install)
+    manifest_path_key = get_target_path_key(global_install, target_browser)
 
     if sys.platform.startswith('win32'):
+        win_validate_browser(target_browser)
         manifest_path = MANIFEST_TARGET_PATH_WIN
         delete_registry_keys(manifest_path_key)
     elif sys.platform.startswith('darwin'):

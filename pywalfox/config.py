@@ -8,8 +8,6 @@ UNIX_SOCKET_PATH_ALT = '/tmp/pywalfox_socket_alt'
 WIN_SOCKET_HOST = ('127.0.0.1', 56744)
 WIN_SOCKET_HOST_ALT = ('127.0.0.1', 56745)
 
-SUPPORTED_BROWSERS = ['firefox']
-
 HOME_PATH = os.path.expanduser('~')
 XDG_CACHE_DIR = os.getenv('XDG_CACHE_HOME', os.path.join(HOME_PATH, '.cache'))
 PYWAL_COLORS_PATH = os.path.join(XDG_CACHE_DIR, os.path.join('wal', 'colors.json'))
