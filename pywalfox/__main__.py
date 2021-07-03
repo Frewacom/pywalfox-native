@@ -64,6 +64,11 @@ setup_group.add_argument('--executable',
         nargs='?',
         type=str,
         help='use a custom path for the `pywalfox` executable')
+setup_group.add_argument('--browser',
+        dest='target_browser',
+        default='firefox',
+        choices=['firefox', 'librewolf'],
+        help='the browser to install pywalfox to')
 
 def get_python_version():
     """Gets the current python version and checks if it is supported."""
@@ -170,12 +175,12 @@ def handle_args(args):
             print('pywalfox install --executable <path-to-pywalfox-executable>')
             sys.exit(1)
 
-        start_setup(args.global_install, path_to_use)
+        start_setup(args.global_install, path_to_use, args.target_browser)
         sys.exit(0)
 
     if args.action == 'uninstall':
         from pywalfox.install import start_uninstall
-        start_uninstall(args.global_install)
+        start_uninstall(args.global_install, args.target_browser)
         sys.exit(0)
 
     parser.print_help()
