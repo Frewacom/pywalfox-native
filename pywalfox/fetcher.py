@@ -1,6 +1,5 @@
-import logging
 import json
-from json.decoder import JSONDecodeError
+import logging
 from .config import PYWAL_COLORS_PATH
 
 def get_pywal_colors():
@@ -30,7 +29,7 @@ def get_pywal_colors():
                 logging.error(error_message)
                 return (False, None, error_message)
 
-    except (IOError, JSONDecodeError):
+    except (IOError, ValueError):
         error_message = 'Could not read colors from: %s' % PYWAL_COLORS_PATH
         logging.error(error_message)
         return (False, None, error_message)
