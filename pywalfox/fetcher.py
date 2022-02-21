@@ -2,6 +2,11 @@ import json
 import logging
 from .config import PYWAL_COLORS_PATH
 
+def create_error(err):
+    error_message = 'Failed to read colors: {0}'.format(err)
+    logging.error(error_message)
+    return (False, None, error_message)
+
 def get_pywal_colors():
     """
     Fetches the Pywal colors from the cache file.
@@ -33,6 +38,12 @@ def get_pywal_colors():
         error_message = 'Could not read colors from: %s' % PYWAL_COLORS_PATH
         logging.error(error_message)
         return (False, None, error_message)
+    except JSONDecodeError as err:
+        return create_error(err)
+    except IOError as err:
+        return create_error(err)
+    except:
+        return create_error(sys.exc_info()[1])
 
     if len(colors) < 16:
         error_message = '%s containing the generated Pywal colors is invalid' % PYWAL_COLORS_PATH
