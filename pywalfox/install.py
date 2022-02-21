@@ -3,7 +3,7 @@ import sys
 import shutil
 import fileinput
 
-from .config import APP_PATH, HOME_PATH
+from .config import APP_PATH, HOME_PATH, BIN_PATH_WIN
 
 if sys.platform.startswith('win32'):
     try:
@@ -173,7 +173,7 @@ def delete_registry_keys(manifest_path_key):
         print('Failed to remove existing registry key: %s' % str(e))
         return
 
-def win_setup(manifest_path_key, bin_path):
+def win_setup(manifest_path_key):
     """Windows installation."""
     hkey = setup_register(manifest_path_key)
 
@@ -192,7 +192,7 @@ def win_setup(manifest_path_key, bin_path):
         print('Failed to set registry key: %s\n%s' % (reg_key, str(e)))
         sys.exit(1)
 
-    copy_manifest(MANIFEST_TARGET_PATH_WIN, bin_path)
+    copy_manifest(MANIFEST_TARGET_PATH_WIN, BIN_PATH_WIN)
 
 def linux_setup(manifest_path_key, bin_path):
     """Linux installation."""
@@ -221,7 +221,7 @@ def start_setup(global_install, bin_path, target_browser):
 
     if sys.platform.startswith('win32'):
         win_validate_browser(target_browser)
-        win_setup(manifest_path_key, bin_path)
+        win_setup(manifest_path_key)
     elif sys.platform.startswith('darwin'):
         darwin_setup(manifest_path_key, bin_path)
     else:
