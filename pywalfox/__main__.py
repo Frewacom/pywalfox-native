@@ -177,7 +177,7 @@ def handle_args(args):
                     os.path.dirname(os.path.abspath(__file__)),
                     os.path.basename(__file__)
                 )
-            if "__main__.py" in path_to_use:
+            if not os.path.isabs(path_to_use) or "__main__.py" in path_to_use:
                 no_executable()
 
         if not os.path.exists(path_to_use) or not os.path.isfile(path_to_use):
