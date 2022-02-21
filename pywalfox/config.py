@@ -17,6 +17,7 @@ EXECUTABLE_PATH = sys.argv[0]
 
 APP_PATH = os.path.dirname(os.path.abspath(__file__))
 CSS_PATH = os.path.join(APP_PATH, 'assets/css')
+BIN_PATH_WIN = os.path.join(APP_PATH, 'bin/win.bat')
 
 FIREFOX_PROFILES_PATH_LINUX = os.path.join(HOME_PATH, '.mozilla/firefox')
 FIREFOX_PROFILES_PATH_WIN = os.path.join(HOME_PATH, 'AppData/Roaming/Mozilla/Firefox')
