@@ -60,7 +60,6 @@ setup_group.add_argument('-g', '--global',
         help='installs/uninstalls the native host manifest globally')
 setup_group.add_argument('--executable',
         dest='custom_path',
-        default=EXECUTABLE_PATH,
         nargs='?',
         type=str,
         help='use a custom path for the `pywalfox` executable')
@@ -130,6 +129,11 @@ def run_daemon():
     atexit.register(daemon.close)
     daemon.start()
 
+def no_executable():
+    print('Could not find executable path, please re-run the installation with:')
+    print('pywalfox install --executable <path-to-pywalfox-executable>')
+    sys.exit(1)
+
 def handle_args(args):
     """Handles CLI arguments."""
     if args.version:
@@ -164,16 +168,20 @@ def handle_args(args):
         from pywalfox.install import start_setup
 
         path_to_use = EXECUTABLE_PATH
-
-        if not args.custom_path:
-            path_to_use = EXECUTABLE_PATH
-        else:
+        if args.custom_path:
             path_to_use = args.custom_path
+        else:
+            # Try to find a valid path
+            if not os.path.isabs(path_to_use):
+                path_to_use = os.path.join(
+                    os.path.dirname(os.path.abspath(__file__)),
+                    os.path.basename(__file__)
+                )
+            if "__main__.py" in path_to_use:
+                no_executable()
 
         if not os.path.exists(path_to_use) or not os.path.isfile(path_to_use):
-            print('Could not find executable path, please re-run the installation:')
-            print('pywalfox install --executable <path-to-pywalfox-executable>')
-            sys.exit(1)
+            no_executable()
 
         start_setup(args.global_install, path_to_use, args.target_browser)
         sys.exit(0)
