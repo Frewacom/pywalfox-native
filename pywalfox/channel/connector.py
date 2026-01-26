@@ -1,7 +1,6 @@
-import os
 import socket
 import logging
-from ..config import UNIX_SOCKET_PATH, WIN_SOCKET_HOST, UNIX_SOCKET_PATH_ALT, WIN_SOCKET_HOST_ALT
+from ..config import UNIX_SOCKET_PATH, WIN_SOCKET_HOST, WIN_SOCKET_HOST_ALT
 
 class Connector:
     """
@@ -21,25 +20,10 @@ class Connector:
             self.socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
             logging.debug('Setup socket server using AF_INET (win32)')
         else:
-            if validate_host is True:
-                self.host = self.get_unix_socket_path()
-
-            self.hosts = [UNIX_SOCKET_PATH, UNIX_SOCKET_PATH_ALT]
+            self.host = UNIX_SOCKET_PATH
+            self.hosts = [UNIX_SOCKET_PATH]
             self.socket = socket.socket(socket.AF_UNIX, socket.SOCK_DGRAM)
             logging.debug('Setup socket server using AF_UNIX (linux/darwin)')
-
-    def get_unix_socket_path(self):
-        """
-        Get an available path to bind the UNIX-socket to.
-
-        :return: the path to be used when binding the UNIX-socket
-        :rType: str
-        """
-        if os.path.exists(UNIX_SOCKET_PATH):
-            logging.debug('Default UNIX-socket is already in use')
-            return UNIX_SOCKET_PATH_ALT
-
-        return UNIX_SOCKET_PATH
 
     def get_win_socket_host(self):
         """
