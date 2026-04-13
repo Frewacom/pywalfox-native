@@ -17,6 +17,7 @@ MANIFEST_TARGET_NAME = 'pywalfox.json'
 WIN_REGISTRY_PATH = r'Software\Mozilla\NativeMessagingHosts\pywalfox'
 MANIFEST_TARGET_PATH_WIN = os.path.join(HOME_PATH, '.pywalfox')
 
+# Might change: https://bugzilla.mozilla.org/show_bug.cgi?id=2005167
 MANIFEST_TARGET_PATHS_LINUX = {
     'FIREFOX': os.path.join('/usr/lib/mozilla/native-messaging-hosts'),
     'FIREFOX_USER': os.path.join(HOME_PATH, '.mozilla/native-messaging-hosts'),

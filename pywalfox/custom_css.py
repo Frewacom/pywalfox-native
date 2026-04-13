@@ -5,7 +5,7 @@ import sys
 import shutil
 import logging
 import fileinput
-from .config import CSS_PATH, FIREFOX_PROFILES_PATH_WIN, FIREFOX_PROFILES_PATH_DARWIN, FIREFOX_PROFILES_PATH_LINUX
+from .config import CSS_PATH, FIREFOX_PROFILES_PATH_WIN, FIREFOX_PROFILES_PATH_DARWIN, FIREFOX_PROFILES_PATH_LINUX, FIREFOX_PROFILES_PATH_LINUX_XDG
 
 try:
     import configparser
@@ -20,6 +20,9 @@ def get_firefox_profiles_path():
     elif sys.platform.startswith('darwin'):
         return FIREFOX_PROFILES_PATH_DARWIN
     else:
+        # Newer Firefox versions may use XDG_CONFIG_HOME (~/.config/firefox)
+        if os.path.isfile(os.path.join(FIREFOX_PROFILES_PATH_LINUX_XDG, 'profiles.ini')):
+            return FIREFOX_PROFILES_PATH_LINUX_XDG
         return FIREFOX_PROFILES_PATH_LINUX
 
 def get_profile_from_ini():
