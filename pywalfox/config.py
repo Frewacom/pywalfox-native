@@ -10,6 +10,7 @@ WIN_SOCKET_HOST_ALT = ('127.0.0.1', 56745)
 
 HOME_PATH = os.path.expanduser('~')
 XDG_CACHE_DIR = os.getenv('XDG_CACHE_HOME', os.path.join(HOME_PATH, '.cache'))
+XDG_CONFIG_DIR = os.getenv('XDG_CONFIG_HOME', os.path.join(HOME_PATH, '.config'))
 PYWAL_COLORS_PATH = os.path.join(XDG_CACHE_DIR, os.path.join('wal', 'colors.json'))
 
 # This will be set to the executable path by pip
@@ -20,6 +21,7 @@ CSS_PATH = os.path.join(APP_PATH, 'assets/css')
 BIN_PATH_WIN = os.path.join(APP_PATH, 'bin/win.bat')
 
 FIREFOX_PROFILES_PATH_LINUX = os.path.join(HOME_PATH, '.mozilla/firefox')
+FIREFOX_PROFILES_PATH_LINUX_XDG = os.path.join(XDG_CONFIG_DIR, 'firefox')
 FIREFOX_PROFILES_PATH_WIN = os.path.join(HOME_PATH, 'AppData/Roaming/Mozilla/Firefox')
 FIREFOX_PROFILES_PATH_DARWIN = os.path.join(HOME_PATH, 'Library/Application Support/Firefox')
 
