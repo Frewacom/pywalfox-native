@@ -63,11 +63,6 @@ setup_group.add_argument('--executable',
         nargs='?',
         type=str,
         help='use a custom path for the `pywalfox` executable')
-setup_group.add_argument('--browser',
-        dest='target_browser',
-        default='firefox',
-        choices=['firefox', 'librewolf'],
-        help='the browser to install pywalfox to')
 
 def get_python_version():
     """Gets the current python version and checks if it is supported."""

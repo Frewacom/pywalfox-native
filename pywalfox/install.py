@@ -20,15 +20,11 @@ MANIFEST_TARGET_PATH_WIN = os.path.join(HOME_PATH, '.pywalfox')
 MANIFEST_TARGET_PATHS_LINUX = {
     'FIREFOX': os.path.join('/usr/lib/mozilla/native-messaging-hosts'),
     'FIREFOX_USER': os.path.join(HOME_PATH, '.mozilla/native-messaging-hosts'),
-    'LIBREWOLF': os.path.join('/usr/lib/librewolf/native-messaging-hosts'),
-    'LIBREWOLF_USER': os.path.join(HOME_PATH, '.librewolf/native-messaging-hosts'),
 }
 
 MANIFEST_TARGET_PATHS_DARWIN = {
     'FIREFOX': os.path.join('/Library/Application Support/Mozilla/NativeMessagingHosts'),
     'FIREFOX_USER': os.path.join(HOME_PATH, 'Library/Application Support/Mozilla/NativeMessagingHosts'),
-    'LIBREWOLF': os.path.join('/Library/Application Support/Librewolf/NativeMessagingHosts'),
-    'LIBREWOLF_USER': os.path.join(HOME_PATH, 'Library/Application Support/Librewolf/NativeMessagingHosts'),
 }
 
 def create_hosts_directory(hosts_path):
@@ -53,7 +49,7 @@ def remove_existing_manifest(full_path, print_errors=True):
         else:
             if print_errors is True:
                 print('No manifest is installed at: %s' % full_path)
-    except Exception as e:
+    except OSError as e:
         if print_errors is True:
             if e.errno == 13: # permission error
                 print('Permission denied when trying to remove the manifest.')
@@ -89,7 +85,7 @@ def set_daemon_path(manifest_path, bin_path):
     :param bin_path str: the path to the daemon executable
     """
     normalized_path = normalize_path(bin_path)
-    for line in fileinput.FileInput(manifest_path, inplace=1):
+    for line in fileinput.FileInput(manifest_path, inplace=True):
         line = line.replace("<path>", normalized_path)
         print(line.rstrip('\n'))
 
@@ -109,7 +105,7 @@ def copy_manifest(target_path, bin_path):
         remove_existing_manifest(full_path, False)
         shutil.copyfile(MANIFEST_SRC_PATH, full_path)
         print('Copied manifest to: %s' % full_path)
-    except Exception as e:
+    except OSError as e:
         if e.errno == 13: # permission error
             print('Permission denied when trying to install the manifest.')
             print('If you are trying to install it globally, rerun this script with admin privileges.')
@@ -134,9 +130,6 @@ def get_target_path_key(global_install, target_browser):
     :rType: str
     """
     browser_prefix = 'FIREFOX'
-
-    if target_browser == 'librewolf':
-        browser_prefix = 'LIBREWOLF'
 
     if global_install is True:
         return browser_prefix
