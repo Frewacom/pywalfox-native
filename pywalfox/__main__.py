@@ -24,6 +24,7 @@ else:
 # https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/Native_messaging#exchanging_messages
 def handle_error(self, message=None):
     if len(sys.argv) == 3 and sys.argv[2] == 'pywalfox@frewacom.org':
+        apply_saved_profile_path()
         setup_logging(False, False)
         run_daemon()
     else:
@@ -36,7 +37,7 @@ parser = argparse.ArgumentParser(description='Pywalfox - Native messaging host')
 parser.error = handle_error
 
 setup_group = parser.add_argument_group('install/uninstall')
-start_group = parser.add_argument_group('messaging host')
+start_group = parser.add_argument_group('start')
 parser.add_argument('action',
         nargs='?',
         default=None,
@@ -45,24 +46,48 @@ parser.add_argument('action',
 parser.add_argument('-v', '--version',
         dest='version',
         action='store_true',
-        help='displays the current version of the daemon')
+        help='displays current version of daemon')
 start_group.add_argument('-p', '--print',
         dest='print_mode',
         action='store_true',
-        help='writes debugging output from the native messaging host to stdout')
+        help='writes debugging output from native messaging host to stdout')
 start_group.add_argument('--verbose',
         dest='verbose',
         action='store_true',
-        help='runs the native messaging host in verbose mode')
+        help='runs native messaging host in verbose mode')
 setup_group.add_argument('-g', '--global',
         dest='global_install',
         action='store_true',
-        help='installs/uninstalls the native host manifest globally')
+        help='installs/uninstalls native host manifest globally')
 setup_group.add_argument('--executable',
         dest='custom_path',
         nargs='?',
         type=str,
         help='use a custom path for the `pywalfox` executable')
+setup_group.add_argument('--manifest-path',
+        dest='manifest_path',
+        type=str,
+        default=None,
+        help='overrides native messaging host manifest directory path')
+setup_group.add_argument('--profile-path',
+        dest='profile_path',
+        type=str,
+        default=None,
+        help='overrides profiles directory path')
+
+def apply_saved_profile_path(cli_override=None):
+    """
+    Applies the Firefox profile path override.
+    Uses the CLI flag if provided, otherwise falls back to the persisted setting.
+    """
+    path = cli_override
+    if path is None:
+        from pywalfox.settings import get_setting
+        path = get_setting('profile_path')
+
+    if path is not None:
+        from pywalfox.custom_css import set_profile_path_override
+        set_profile_path_override(path)
 
 def get_python_version():
     """Gets the current python version and checks if it is supported."""
@@ -156,6 +181,7 @@ def handle_args(args):
         sys.exit(0)
 
     if args.action == 'start':
+        apply_saved_profile_path(args.profile_path)
         setup_logging(args.verbose, args.print_mode)
         run_daemon()
 
@@ -178,12 +204,29 @@ def handle_args(args):
         if not os.path.exists(path_to_use) or not os.path.isfile(path_to_use):
             no_executable()
 
-        start_setup(args.global_install, path_to_use, args.target_browser)
+        start_setup(args.global_install, path_to_use,
+                     manifest_path=args.manifest_path)
+
+        if args.profile_path:
+            from pywalfox.settings import save_settings
+            save_settings({'profile_path': args.profile_path})
+            print('Saved custom Firefox profile path: %s' % args.profile_path)
+        else:
+            print('')
+            print('NOTE: Firefox forks (e.g. Librewolf) may require custom paths:')
+            print('  --manifest-path <path>   directory for the native messaging host manifest')
+            print('  --profile-path  <path>   directory containing your browser\'s profiles.ini')
+            print('')
+            print('Example:')
+            print('  pywalfox install --manifest-path ~/.mozilla/native-messaging-hosts \\')
+            print('                   --profile-path  ~/.config/librewolf/librewolf')
+
         sys.exit(0)
 
     if args.action == 'uninstall':
         from pywalfox.install import start_uninstall
-        start_uninstall(args.global_install, args.target_browser)
+        start_uninstall(args.global_install,
+                        manifest_path=args.manifest_path)
         sys.exit(0)
 
     parser.print_help()

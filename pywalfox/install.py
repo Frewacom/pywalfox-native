@@ -120,22 +120,19 @@ def copy_manifest(target_path, bin_path):
 
     set_daemon_path(full_path, bin_path)
 
-def get_target_path_key(global_install, target_browser):
+def get_target_path_key(global_install):
     """
     Gets the path key for the 'native-messaging-hosts' directory based on
     if the manifest should be installed locally or globally.
 
     :param global_install bool: if the manifest should be installed for all users
-    :param target_browser bool: the browser to install the manifest to
     :return: the key in MANIFEST_TARGET_PATHS_* corresponding to the manifest path
     :rType: str
     """
-    browser_prefix = 'FIREFOX'
-
     if global_install is True:
-        return browser_prefix
+        return 'FIREFOX'
     else:
-        return '%s_USER' % (browser_prefix)
+        return 'FIREFOX_USER'
 
 def setup_register(manifest_path_key):
     """
@@ -198,12 +195,7 @@ def darwin_setup(manifest_path_key, bin_path):
     manifest_path = MANIFEST_TARGET_PATHS_DARWIN[manifest_path_key]
     copy_manifest(manifest_path, bin_path)
 
-def win_validate_browser(target_browser):
-    if target_browser != 'firefox':
-        print('This browser is currently not supported by the Windows pywalfox installer')
-        sys.exit(1)
-
-def start_setup(global_install, bin_path, target_browser):
+def start_setup(global_install, bin_path, manifest_path=None):
     """
     Installs the native messaging host manifest.
 
@@ -211,26 +203,35 @@ def start_setup(global_install, bin_path, target_browser):
     """
     print('Using executable path: %s' % (bin_path))
 
-    manifest_path_key = get_target_path_key(global_install, target_browser)
+    if manifest_path is not None:
+        print('Using custom manifest path: %s' % manifest_path)
+        copy_manifest(manifest_path, bin_path)
+        return
+
+    manifest_path_key = get_target_path_key(global_install)
 
     if sys.platform.startswith('win32'):
-        win_validate_browser(target_browser)
         win_setup(manifest_path_key)
     elif sys.platform.startswith('darwin'):
         darwin_setup(manifest_path_key, bin_path)
     else:
         linux_setup(manifest_path_key, bin_path)
 
-def start_uninstall(global_install, target_browser):
+def start_uninstall(global_install, manifest_path=None):
     """
     Tries to remove an existing manifest and delete registry keys (win32).
 
     :param global_install bool: if the manifest should be uninstalled for all users
     """
-    manifest_path_key = get_target_path_key(global_install, target_browser)
+    if manifest_path is not None:
+        print('Using custom manifest path: %s' % manifest_path)
+        full_manifest_path = get_full_manifest_path(manifest_path)
+        remove_existing_manifest(full_manifest_path)
+        return
+
+    manifest_path_key = get_target_path_key(global_install)
 
     if sys.platform.startswith('win32'):
-        win_validate_browser(target_browser)
         manifest_path = MANIFEST_TARGET_PATH_WIN
         delete_registry_keys(manifest_path_key)
     elif sys.platform.startswith('darwin'):

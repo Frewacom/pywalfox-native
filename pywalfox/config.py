@@ -1,7 +1,7 @@
 import os
 import sys
 
-DAEMON_VERSION = '2.8.0'
+DAEMON_VERSION = '2.9.0'
 
 UNIX_SOCKET_PATH = '/tmp/pywalfox_socket'
 UNIX_SOCKET_PATH_ALT = '/tmp/pywalfox_socket_alt'
@@ -30,6 +30,15 @@ LOG_FILE_MAX_SIZE = 1000*200 # 0.2 mb
 LOG_FILE_DATE_FORMAT = '%m-%d-%Y %I:%M:%S'
 LOG_FILE_FORMAT = '[%(asctime)s] %(levelname)s:%(message)s'
 LOG_FILE_PATH = os.path.join(XDG_CACHE_DIR, 'pywalfox.log')
+
+if sys.platform.startswith('win32'):
+    PYWALFOX_CONFIG_DIR = os.path.join(os.getenv('APPDATA', os.path.join(HOME_PATH, 'AppData', 'Roaming')), 'pywalfox')
+elif sys.platform.startswith('darwin'):
+    PYWALFOX_CONFIG_DIR = os.path.join(HOME_PATH, 'Library', 'Application Support', 'pywalfox')
+else:
+    PYWALFOX_CONFIG_DIR = os.path.join(XDG_CONFIG_DIR, 'pywalfox')
+
+PYWALFOX_CONFIG_PATH = os.path.join(PYWALFOX_CONFIG_DIR, 'config.json')
 
 ACTIONS = {
     'VERSION': 'debug:version',

@@ -13,8 +13,17 @@ except ImportError: # python 2.7.x
     import ConfigParser as configparser
 
 
+_profile_path_override = None
+
+def set_profile_path_override(path):
+    """Sets a custom Firefox profile path, overriding OS-specific defaults."""
+    global _profile_path_override
+    _profile_path_override = path
+
 def get_firefox_profiles_path():
     """Gets the correct Firefox profiles folder based on the current OS."""
+    if _profile_path_override is not None:
+        return _profile_path_override
     if sys.platform.startswith('win32'):
         return FIREFOX_PROFILES_PATH_WIN
     elif sys.platform.startswith('darwin'):
