@@ -213,11 +213,7 @@ def handle_args(args):
             print('Saved custom Firefox profile path: %s' % args.profile_path)
         else:
             print('')
-            print('NOTE: Firefox forks (e.g. Librewolf) may require custom paths:')
-            print('  --manifest-path <path>   directory for the native messaging host manifest')
-            print('  --profile-path  <path>   directory containing your browser\'s profiles.ini')
-            print('')
-            print('Example:')
+            print('NOTE: Firefox forks (e.g. Librewolf) may require custom paths, e.g.')
             print('  pywalfox install --manifest-path ~/.mozilla/native-messaging-hosts \\')
             print('                   --profile-path  ~/.config/librewolf/librewolf')
 
