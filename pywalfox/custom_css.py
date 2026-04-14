@@ -119,8 +119,9 @@ def disable_custom_css(chrome_path, name):
     filename = add_css_file_extension(name)
     logging.debug('Disabling custom CSS file: %s' % filename)
     try:
-        os.remove(os.path.join(chrome_path, filename))
-        logging.debug('%s was disabled' % filename)
+        if os.path.isfile(os.path.join(chrome_path, filename)):
+            os.remove(os.path.join(chrome_path, filename))
+            logging.debug('%s was disabled' % filename)
         return (True, 'Custom CSS: %s has been disabled' % filename)
     except Exception as e:
         logging.error('%s could not be disabled: %s' % (filename, str(e)))
