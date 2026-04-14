@@ -31,7 +31,7 @@ def handle_error(self, message=None):
         parser.print_help()
         sys.exit(1)
 
-parser = argparse.ArgumentParser(description='Pywalfox - Native messaging host')
+parser = argparse.ArgumentParser(description='Pywalfox native messaging host v.%s' % DAEMON_VERSION)
 
 # Register custom error handler
 parser.error = handle_error
