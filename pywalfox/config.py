@@ -4,7 +4,10 @@ import tempfile
 
 DAEMON_VERSION = '2.9.0rc1'
 
-UNIX_SOCKET_PATH = os.path.join(tempfile.gettempdir(), 'pywalfox_socket_%d' % os.getuid())
+if sys.platform.startswith('win32'):
+    UNIX_SOCKET_PATH = None
+else:
+    UNIX_SOCKET_PATH = os.path.join(tempfile.gettempdir(), 'pywalfox_socket_%d' % os.getuid())
 WIN_SOCKET_HOST = ('127.0.0.1', 56744)
 WIN_SOCKET_HOST_ALT = ('127.0.0.1', 56745)
 
