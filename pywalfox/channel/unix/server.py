@@ -17,10 +17,11 @@ class Server(Connector):
         test_socket = socket.socket(socket.AF_UNIX, socket.SOCK_DGRAM)
         try:
             test_socket.connect(self.host)
-            test_socket.close()
             return True
         except (socket.error, OSError):
             return False
+        finally:
+            test_socket.close()
 
     def delete_existing_socket(self):
         """Deletes the existing UNIX-socket if it exists and is stale."""
