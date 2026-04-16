@@ -8,6 +8,7 @@ from .custom_css import get_firefox_chrome_path, enable_custom_css, set_font_siz
 from .config import DAEMON_VERSION, ACTIONS, COMMANDS
 from .response import Message
 from .messenger import Messenger
+from .settings import get_setting, save_settings
 
 if sys.platform.startswith('win32'):
     from .channel.win.server import Server
@@ -27,6 +28,7 @@ class Daemon:
         self.messenger = Messenger(self.python_version)
         self.socket_server = Server()
         self.is_running = False
+        self.persisted_state_sent = False
 
     def set_chrome_path(self):
         """Tries to set the path to the chrome directory."""
@@ -160,6 +162,14 @@ class Daemon:
             data=mode,
         ))
 
+    def send_persisted_state(self):
+        """Sends persisted settings (e.g. theme mode) to the extension on first connect."""
+        self.persisted_state_sent = True
+        theme_mode = get_setting('theme_mode')
+        if theme_mode is not None:
+            logging.debug('Applying persisted theme mode: %s' % theme_mode)
+            self.send_theme_mode(theme_mode)
+
     def handle_message(self, message):
         """
         Handles the incoming messages and does the appropriate action.
@@ -172,6 +182,8 @@ class Daemon:
                 self.send_version()
             elif action == ACTIONS['COLORS']:
                 self.send_pywal_colors()
+                if not self.persisted_state_sent:
+                    self.send_persisted_state()
             elif action == ACTIONS['CSS_ENABLE']:
                 self.send_enable_css_response(message)
             elif action == ACTIONS['CSS_DISABLE']:
@@ -194,12 +206,15 @@ class Daemon:
                 self.send_pywal_colors()
             elif message == COMMANDS['THEME_MODE_DARK']:
                 logging.debug('CLI: Set theme mode to dark')
+                save_settings({'theme_mode': 'dark'})
                 self.send_theme_mode('dark')
             elif message == COMMANDS['THEME_MODE_LIGHT']:
                 logging.debug('CLI: Set theme mode to light')
+                save_settings({'theme_mode': 'light'})
                 self.send_theme_mode('light')
             elif message == COMMANDS['THEME_MODE_AUTO']:
                 logging.debug('CLI: Set theme mode to auto')
+                save_settings({'theme_mode': 'auto'})
                 self.send_theme_mode('auto')
 
     def start_socket_server(self):

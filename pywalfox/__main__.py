@@ -8,6 +8,7 @@ import subprocess
 from .daemon import Daemon
 from .utils.logger import setup_logging
 from .config import DAEMON_VERSION, LOG_FILE_PATH, COMMANDS, EXECUTABLE_PATH
+from .settings import save_settings
 
 if sys.platform.startswith('win32'):
     from .channel.win.client import Client
@@ -119,12 +120,18 @@ def send_update_action():
     send_client_command(COMMANDS['UPDATE'])
 
 def send_theme_mode_dark():
+    save_settings({'theme_mode': 'dark'})
+    print('Saved theme mode: dark')
     send_client_command(COMMANDS['THEME_MODE_DARK'])
 
 def send_theme_mode_light():
+    save_settings({'theme_mode': 'light'})
+    print('Saved theme mode: light')
     send_client_command(COMMANDS['THEME_MODE_LIGHT'])
 
 def send_theme_mode_auto():
+    save_settings({'theme_mode': 'auto'})
+    print('Saved theme mode: auto')
     send_client_command(COMMANDS['THEME_MODE_AUTO'])
 
 def open_log_file():
