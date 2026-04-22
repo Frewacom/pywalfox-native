@@ -94,7 +94,7 @@ def get_python_version():
     """Gets the current python version and checks if it is supported."""
     python_version = sys.version_info
     version_label = '%s.%s.%s' % (python_version[0], python_version[1], python_version[2])
-    if python_version < (2, 7):
+    if python_version < (3, 6):
         logging.error('Python version %s is not supported' % version_label)
         sys.exit(1)
     else:
