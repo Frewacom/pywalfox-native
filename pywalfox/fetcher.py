@@ -39,7 +39,7 @@ def get_pywal_colors():
         error_message = 'Could not read colors from: %s' % PYWAL_COLORS_PATH
         logging.error(error_message)
         return (False, None, error_message)
-    except JSONDecodeError as err:
+    except json.JSONDecodeError as err:
         return create_error(err)
     except IOError as err:
         return create_error(err)
