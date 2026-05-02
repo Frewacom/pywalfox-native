@@ -2,7 +2,7 @@ import os
 import sys
 import tempfile
 
-DAEMON_VERSION = '2.9.0rc2'
+DAEMON_VERSION = '2.9.0'
 
 if sys.platform.startswith('win32'):
     UNIX_SOCKET_PATH = None
