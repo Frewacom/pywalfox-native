@@ -1,4 +1,5 @@
 import logging
+import os
 from logging.handlers import RotatingFileHandler
 from ..config import LOG_FILE_FORMAT, LOG_FILE_DATE_FORMAT, LOG_FILE_PATH, LOG_FILE_MAX_SIZE, LOG_FILE_COUNT
 
@@ -24,6 +25,7 @@ def setup_logging(verbose, print_mode):
     :param verbose bool: if debug messages should be saved/printed
     :param print_mode bool: whether or not to print to the terminal
     """
+    os.makedirs(os.path.dirname(LOG_FILE_PATH), exist_ok=True)
     if verbose is True:
         if print_mode is True:
             logging.basicConfig(
