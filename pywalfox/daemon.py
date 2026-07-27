@@ -3,7 +3,7 @@ import logging
 from threading import Thread
 
 from .fetcher import get_pywal_colors
-from .custom_css import get_firefox_chrome_path, enable_custom_css, set_font_size, disable_custom_css
+from .custom_css import get_chrome_path, detect_calling_app, enable_custom_css, set_font_size, disable_custom_css
 
 from .config import DAEMON_VERSION, ACTIONS, COMMANDS
 from .response import Message
@@ -24,6 +24,7 @@ class Daemon:
     """
     def __init__(self, python_version):
         self.python_version = python_version
+        self.app = detect_calling_app()
         self.set_chrome_path()
         self.messenger = Messenger(self.python_version)
         self.socket_server = Server()
@@ -31,8 +32,8 @@ class Daemon:
         self.persisted_state_sent = False
 
     def set_chrome_path(self):
-        """Tries to set the path to the chrome directory."""
-        self.chrome_path = get_firefox_chrome_path()
+        """Tries to set the path to the chrome directory for the calling app."""
+        self.chrome_path = get_chrome_path(self.app)
 
     def check_chrome_path(self, action, target):
         """
