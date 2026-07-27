@@ -24,9 +24,31 @@ CSS_PATH = os.path.join(APP_PATH, 'assets/css')
 BIN_PATH_WIN = os.path.join(APP_PATH, 'bin/win.bat')
 
 FIREFOX_PROFILES_PATH_LINUX = os.path.join(HOME_PATH, '.mozilla/firefox')
+# Some distro builds put the XDG-compliant profile dir straight under
+# $XDG_CONFIG_HOME/firefox; others (confirmed live: Fedora's firefox 153.0)
+# nest it under a 'mozilla' vendor subdirectory instead, i.e.
+# $XDG_CONFIG_HOME/mozilla/firefox. Check both, vendor-subdir first since
+# that's what the profiles.ini fix in issue #8 was actually needed for.
 FIREFOX_PROFILES_PATH_LINUX_XDG = os.path.join(XDG_CONFIG_DIR, 'firefox')
+FIREFOX_PROFILES_PATH_LINUX_XDG_VENDOR = os.path.join(XDG_CONFIG_DIR, 'mozilla/firefox')
 FIREFOX_PROFILES_PATH_WIN = os.path.join(HOME_PATH, 'AppData/Roaming/Mozilla/Firefox')
 FIREFOX_PROFILES_PATH_DARWIN = os.path.join(HOME_PATH, 'Library/Application Support/Firefox')
+
+# Thunderbird's profile layout mirrors Firefox's exactly (same toolkit), including
+# both possible XDG-compliant paths above.
+THUNDERBIRD_PROFILES_PATH_LINUX = os.path.join(HOME_PATH, '.thunderbird')
+THUNDERBIRD_PROFILES_PATH_LINUX_XDG = os.path.join(XDG_CONFIG_DIR, 'thunderbird')
+THUNDERBIRD_PROFILES_PATH_LINUX_XDG_VENDOR = os.path.join(XDG_CONFIG_DIR, 'mozilla/thunderbird')
+THUNDERBIRD_PROFILES_PATH_WIN = os.path.join(HOME_PATH, 'AppData/Roaming/Thunderbird')
+THUNDERBIRD_PROFILES_PATH_DARWIN = os.path.join(HOME_PATH, 'Library/Application Support/Thunderbird')
+
+# Apps supported as separate native-messaging-host callers. Each gets its own persisted
+# settings (see settings.py's per-app helpers) so that installing/fixing one never
+# overwrites the other's profile_path -- see custom_css.detect_calling_app().
+APP_FIREFOX = 'firefox'
+APP_THUNDERBIRD = 'thunderbird'
+SUPPORTED_APPS = (APP_FIREFOX, APP_THUNDERBIRD)
+DEFAULT_APP = APP_FIREFOX
 
 LOG_FILE_COUNT = 1
 LOG_FILE_MAX_SIZE = 1000*200 # 0.2 mb

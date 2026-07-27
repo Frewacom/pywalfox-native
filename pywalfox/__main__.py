@@ -7,8 +7,8 @@ import subprocess
 
 from .daemon import Daemon
 from .utils.logger import setup_logging
-from .config import DAEMON_VERSION, LOG_FILE_PATH, COMMANDS, EXECUTABLE_PATH
-from .settings import save_settings
+from .config import DAEMON_VERSION, LOG_FILE_PATH, COMMANDS, EXECUTABLE_PATH, SUPPORTED_APPS, DEFAULT_APP
+from .settings import save_settings, save_profile_path, get_profile_path
 
 if sys.platform.startswith('win32'):
     from .channel.win.client import Client
@@ -75,20 +75,34 @@ setup_group.add_argument('--profile-path',
         type=str,
         default=None,
         help='overrides profiles directory path')
+setup_group.add_argument('--app',
+        dest='app',
+        type=str,
+        choices=SUPPORTED_APPS,
+        default=DEFAULT_APP,
+        help='which app to install/save settings for (default: %s). Only needed for '
+             'install/uninstall -- at runtime the calling app is auto-detected.' % DEFAULT_APP)
 
 def apply_saved_profile_path(cli_override=None):
     """
-    Applies the Firefox profile path override.
-    Uses the CLI flag if provided, otherwise falls back to the persisted setting.
+    Applies the profile path override for the app that actually spawned this
+    process. Uses the CLI flag if provided (only meaningful for a manual
+    `pywalfox start`), otherwise falls back to that app's persisted setting.
+
+    The calling app itself is auto-detected (see custom_css.detect_calling_app)
+    rather than taken from a CLI flag here, since this runs on every native
+    messaging connection Firefox or Thunderbird makes -- there is no `--app`
+    flag in that invocation to read from.
     """
+    from pywalfox.custom_css import detect_calling_app, set_profile_path_override
+
+    app = detect_calling_app()
     path = cli_override
     if path is None:
-        from pywalfox.settings import get_setting
-        path = get_setting('profile_path')
+        path = get_profile_path(app)
 
     if path is not None:
-        from pywalfox.custom_css import set_profile_path_override
-        set_profile_path_override(path)
+        set_profile_path_override(path, app)
 
 def get_python_version():
     """Gets the current python version and checks if it is supported."""
@@ -215,14 +229,19 @@ def handle_args(args):
                      manifest_path=args.manifest_path)
 
         if args.profile_path:
-            from pywalfox.settings import save_settings
-            save_settings({'profile_path': args.profile_path})
-            print('Saved custom Firefox profile path: %s' % args.profile_path)
+            save_profile_path(args.app, args.profile_path)
+            print('Saved custom %s profile path: %s' % (args.app, args.profile_path))
         else:
             print('')
             print('NOTE: Firefox forks (e.g. Librewolf) may require custom paths, e.g.')
             print('  pywalfox install --manifest-path ~/.mozilla/native-messaging-hosts \\')
             print('                   --profile-path  ~/.config/librewolf/librewolf')
+            print('')
+            print('NOTE: Firefox and Thunderbird are installed as separate apps and need')
+            print('separate profile paths saved -- the calling app is auto-detected at')
+            print('runtime, but --app must be passed explicitly here since install runs')
+            print('from a shell, not from the browser itself, e.g.:')
+            print('  pywalfox install --app thunderbird --profile-path ~/.thunderbird/xxxxxxxx.default-esr')
 
         sys.exit(0)
 
