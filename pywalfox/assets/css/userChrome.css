@@ -1,5 +1,18 @@
 /******************** BEGIN PYWALFOX CUSTOM CSS ********************/
-#main-window {
+/* #main-window is Firefox's root window id -- Thunderbird has several of its
+ * own, one per top-level window type (main window: #messengerWindow, compose
+ * window: #msgcomposeWindow, and potentially more not yet found). Without
+ * each one here, every --pywalfox-* custom property below is undefined in
+ * that window, and any !important rule using one of them (e.g. the button/
+ * search-textbox/menuseparator background below) silently falls back to the
+ * property's initial value (transparent) instead of being skipped, breaking
+ * buttons that otherwise have their own correct themed fill (confirmed live:
+ * Thunderbird's "New Task"/"New Event" primary buttons lost their yellow
+ * background and dark text this way in the main window, and the same
+ * undefined-variable pattern was independently confirmed in the compose
+ * window too, via --pywalfox-darker-background computing to empty string
+ * there). */
+#main-window, #messengerWindow, #msgcomposeWindow {
   --pywalfox-font-size: 13px;
   --pywalfox-font-size-sm: calc(var(--pywalfox-font-size) * 0.9);
   --pywalfox-background: var(--lwt-accent-color);
@@ -84,3 +97,230 @@ panelmultiview {
   color: var(--pywalfox-text) !important;
 }
 /********************* END PYWALFOX CUSTOM CSS *********************/
+
+/******************** BEGIN LAYOUT TOKEN THEME FIX ********************/
+/* Thunderbird's newer "layout" design-system tokens (--layout-background-0..4,
+ * --layout-color-0..3, defined in mail/themes/shared/mail/layout.css) and a
+ * handful of other component-specific tokens (--viewBackground for the
+ * calendar grid, --mmBoxBackground for the mini-month widget, --spaces-bg-
+ * color for the spaces toolbar, etc.) are never wired to the Lightweight
+ * Theme system pywalfox uses -- confirmed by reading Thunderbird's own source
+ * and by live inspection (InspectorUtils.getMatchingCSSRules), they always
+ * resolve to hardcoded light-dark(<zinc-gray>) pairs regardless of any active
+ * theme. This leaves a large surface unthemed: the spaces toolbar, calendar
+ * views (day/week/multiday grid, agenda, mini-month), the thread pane,
+ * message list cards, and the address book.
+ *
+ * Redefining the custom properties themselves at :root does not reliably
+ * cascade into every consumer (confirmed live: calendar-event-column ignores
+ * a --layout-background-0 redefinition at :root even with !important), so
+ * each affected element is targeted directly instead, matching the exact
+ * selector lists Thunderbird's own stylesheets use for each token so nothing
+ * is missed. Still sourced from the live --lwt- and --sidebar- prefixed
+ * variables pywalfox already sets correctly above (never hardcoded), so this
+ * tracks any theme change automatically instead of going stale. */
+
+/* Thunderbird redirects panel/menupopup backgrounds through its own newer
+ * --color-surface-subtle token (never wired to LWT), via a rule that
+ * specifically targets `:is(menupopup, panel)`. pywalfox's own existing fix
+ * two blocks up ("Fix background color of elements that can not be targeted
+ * via the Theme API") already covers menupopup, but not panel -- and popups
+ * like the app (hamburger) menu are specifically <panel> elements, falling
+ * straight through that gap. Confirmed live: appMenu-popup's background
+ * computed to the stock light-dark(#f7f7f7, #262d3b) despite --panel-
+ * background-color being correctly rgb(7,7,34) everywhere else. The inner
+ * <panelview> (the actual content pane of multi-view panels like the app
+ * menu) has its own separate background rule reading the same broken
+ * variable, so it needs the same direct override. Uses
+ * --sidebar-background-color (BackgroundLight) to match the "Popup" role's
+ * intended secondary-background tone, not the darker main-content fill. */
+panel,
+panelview {
+  background-color: var(--sidebar-background-color) !important;
+  color: var(--lwt-text-color) !important;
+}
+
+/* Hamburger (app) menu button icon -- same faint text-color-at-20%-opacity
+ * pattern as the spacesToolbar icons before their fix; use the real accent
+ * color instead. */
+#button-appmenu {
+  fill: var(--toolbarbutton-icon-fill) !important;
+}
+
+/* Thunderbird's "primary" buttons (e.g. the "New Task"/"New Event" side-panel
+ * buttons) carry their own correctly-paired fill/text/border via --button-
+ * primary-*, but pywalfox's own blanket `button {...} !important` rule above
+ * (meant to darken plain buttons) overrides just the background with a
+ * near-black tint, leaving the primary button's dark text invisible against
+ * it. Restore the button's own intended fill here with higher priority. */
+.button-primary {
+  background-color: var(--button-primary-background-color) !important;
+  color: var(--button-primary-text-color) !important;
+  border-color: var(--button-primary-border-color) !important;
+}
+
+/* Left-edge spaces toolbar (mail/calendar/chat/tasks icon bar). */
+#spacesToolbar,
+.spaces-toolbar {
+  background-color: var(--lwt-accent-color) !important;
+}
+
+/* Thunderbird's spacesToolbar icons default to a faint text-color tone
+ * (--spaces-button-text-color, at 20% opacity via Thunderbird's own CSS),
+ * not pywalfox's own accent roles: --toolbarbutton-icon-fill (accentPrimary,
+ * the same "Icons" role driving every other toolbar icon) for inactive, and
+ * --toolbarbutton-icon-fill-attention (accentSecondary, the "Icons attention"
+ * role) for the active/current button -- matching Firefox's own reference
+ * look, where non-active is primary and active is secondary. */
+.spaces-toolbar-button:not(.current) > img {
+  fill: var(--toolbarbutton-icon-fill) !important;
+}
+.spaces-toolbar-button.current > img {
+  fill: var(--toolbarbutton-icon-fill-attention) !important;
+}
+
+/* Generic backdrop behind every tab's content -- shows through as stock gray
+ * whenever a tab's own content (e.g. the address book) doesn't fully fill its
+ * allocated width. Confirmed live via elementFromPoint on the actual visible
+ * gap, not guessed: #tabpanelcontainer was rgb(54, 54, 58), a shade outside
+ * every stock-color set checked while sweeping for this, hence easy to miss. */
+#tabpanelcontainer {
+  background-color: var(--lwt-accent-color) !important;
+}
+
+/* Calendar day/week/multiday grid. Matches the exact combined selector list
+ * Thunderbird's own calendar-views.css uses for var(--viewBackground), so
+ * every consumer of that rule is covered instead of guessing at classes. */
+.multiday-header-corner,
+.day-column-heading,
+calendar-header-container,
+calendar-event-column,
+.multiday-hour-box {
+  background-color: var(--lwt-accent-color) !important;
+  color: var(--lwt-text-color) !important;
+}
+
+/* Calendar agenda (mini list) view. */
+#agenda {
+  background-color: var(--lwt-accent-color) !important;
+}
+.agenda-date-header {
+  background-color: var(--sidebar-background-color) !important;
+  color: var(--sidebar-text-color) !important;
+}
+
+/* Calendar mini-month widget -- lives in the same sidebar column as the
+ * Calendars list, so it matches that furniture tone rather than the main-
+ * content fill used above. */
+calendar-minimonth,
+#calMinimonth {
+  background-color: var(--sidebar-background-color) !important;
+  color: var(--sidebar-text-color) !important;
+}
+.minimonth-nav-section {
+  background-color: var(--sidebar-background-color) !important;
+  color: var(--sidebar-text-color) !important;
+}
+.minimonth-week {
+  background-color: var(--sidebar-background-color) !important;
+  color: var(--lwt-text-color) !important;
+}
+
+/* Calendar tab content wrapper (hbox around the whole grid). */
+#calendarContent {
+  background-color: var(--lwt-accent-color) !important;
+}
+
+/* Tasks tab's own tree/list view -- another direct consumer of
+ * --layout-background-0 missed when that token was first mapped (the
+ * calendar grid's combined selector list doesn't include this one), found
+ * via an allowlist-based sweep (checking against known-correct Noctalia
+ * colors instead of a blocklist of known-stock ones, which missed this). */
+#calendar-task-tree {
+  background-color: var(--lwt-accent-color) !important;
+}
+
+/* Compose window (New Message). The editable message body itself lives in a
+ * same-process about:blank?compose iframe that's actually transparent, so
+ * the stock gray was coming from the outer wrapper div and the window's own
+ * root showing through -- the compose window's <html> has no background
+ * rule at all (unlike the main window, which gets one implicitly from
+ * Thunderbird's own LWT-root styling), and that's separate from the
+ * --pywalfox-* custom-property scope fix above (that only fixes undefined
+ * variables, not a missing rule entirely). Found via a deep audit across
+ * compose/dialog windows, not just the main-window sweeps used so far. */
+#msgcomposeWindow,
+#composeContentBox,
+#messageArea {
+  background-color: var(--lwt-accent-color) !important;
+}
+
+/* Calendar view toggle (day/week/month buttons) and event-filter dropdown. */
+#viewToggle {
+  background-color: var(--sidebar-background-color) !important;
+}
+#event-filter-menulist {
+  background-color: var(--toolbar-field-background-color) !important;
+  color: var(--lwt-text-color) !important;
+}
+
+/* about:3pane (thread pane/message list) and about:addressbook are separate
+ * content documents, but confirmed live (an unscoped canary rule in
+ * userContent.css never applied to either) that userContent.css does not
+ * reach them at all -- they're same-process privileged browsers reached
+ * through userChrome.css's own cascade instead, not the userContent.css
+ * content pipeline. Both correctly inherit the chrome window's --lwt-*
+ * variables, same as any other privileged about: page.
+ *
+ * Known gap: this block does not actually reach about:addressbook at all --
+ * confirmed live (unscoped rule, no @-moz-document wrapper, still stock) that
+ * userChrome.css cannot reach this document, unlike about:3pane which the
+ * identical mechanism correctly themes above. about:addressbook's document
+ * principal has a null URI (likely system-principal), a real structural
+ * difference from about:3pane; both are non-remote (isRemoteBrowser: false),
+ * so it isn't a process-isolation difference. Needs Browser Toolbox
+ * inspection to resolve conclusively rather than more black-box automation.
+ * Left in place since it's harmless and may start working once the real
+ * blocker is found, but do not assume it's doing anything yet. */
+@-moz-document url(about:3pane) {
+  /* The document's own root was never explicitly covered (only its content
+   * children were), so stock gray showed through in any gap not covered by
+   * threadTree/messagePane -- confirmed live via a stock-color allowlist
+   * sweep (checking against known-correct Noctalia colors instead of a
+   * blocklist of known-stock ones), which is what caught this: rgb(54, 54,
+   * 58) wasn't in the earlier blocklist-based sweep's known-stock-colors
+   * list, so it was missed there. */
+  html,
+  .tree-view-scrollable-container,
+  .card-container,
+  .container {
+    background-color: var(--lwt-accent-color) !important;
+    color: var(--lwt-text-color) !important;
+  }
+  message-pane#messagePane {
+    background-color: var(--lwt-accent-color) !important;
+  }
+}
+
+@-moz-document url(about:addressbook) {
+  html,
+  #cardsPane,
+  .tree-view-scrollable-container,
+  .card-container {
+    background-color: var(--lwt-accent-color) !important;
+    color: var(--lwt-text-color) !important;
+  }
+}
+
+/* Known gap, same category as about:addressbook: about:preferences (the
+ * Settings tab) is also unreachable by userChrome.css -- confirmed live with
+ * a literal `lime !important` test rule via @-moz-document, which did not
+ * apply. Its left category sidebar renders correctly navy already (native
+ * LWT inheritance reaches that part), but the main settings content pane
+ * stays stock. Also confirmed the same privileged-runtime-injection
+ * workaround (windowUtils.loadSheetUsingURIString on that window's own
+ * windowUtils) works here too, same as it does for about:addressbook --
+ * strong evidence both share the same real root cause and would both be
+ * fixed by whatever proper extension-level solution eventually resolves
+ * that one, rather than needing to be solved twice. */
+/********************* END LAYOUT TOKEN THEME FIX *********************/
